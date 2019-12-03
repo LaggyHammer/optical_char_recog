@@ -1,4 +1,4 @@
 pytesseract==0.3.0
-PIL
+Pillow==2.2.2
 pdf2image==1.10.0
 nltk==3.4.5
