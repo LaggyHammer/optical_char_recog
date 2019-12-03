@@ -1,0 +1,4 @@
+pytesseract==0.3.0
+PIL
+pdf2image==1.10.0
+nltk==3.4.5
