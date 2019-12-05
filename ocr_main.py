@@ -14,7 +14,9 @@ images = convert_from_bytes(open(filename, 'rb').read(), grayscale=False)
 # Orientation Handling
 def orient_image(image_list, orientation_threshold=0.5, script_threshold=0.5):
     oriented_images = []
+    image_counter = 1
     for img in image_list:
+        print("Handling Orientation for image " + str(image_counter) + " of " + str(len(image_list))+ "...")
         info = tesseract.image_to_osd(img)  # Orientation Info
 
         # Aspect Ratio Check
@@ -22,7 +24,7 @@ def orient_image(image_list, orientation_threshold=0.5, script_threshold=0.5):
         if height > width:
             img = img.rotate(90, expand=True)
             info = tesseract.image_to_osd(img)  # Orientation Info
-            print(info)
+            # print(info)
         info = info.split('\n')
 
         # Rotation Angle (0 or 180)
@@ -47,29 +49,48 @@ def orient_image(image_list, orientation_threshold=0.5, script_threshold=0.5):
 
         img.show()
         oriented_images.append(img)
+        image_counter += 1
+    if oriented_images:
+        print("Orientation Handling Successful")
     return oriented_images
 
-# # Image to Text
-# text = tesseract.image_to_string(img, config=r'--psm 6')
-# print("Text from Image")
-# print(text.lower())
-# text_file = open(filename.split('.')[0] + "_ocr.txt", "w")
-# n = text_file.write(text)
-# text_file.close()
-#
-# ocr_list = text.lower().split('\n')
-# print(ocr_list)
-# req_list = ['bridas','acoplamientos','tornilleria externa','presion de diseno interna']
-# req_info = {}
-# for item in ocr_list:
-#     for key in req_list:
-#         if key in item:
-#             s1 = item
-#             s2 = key
-#             info = s1[s1.index(s2) + len(s2) + 1:]
-#             req_info[key] = info
-#
-# print(req_info)
+
+# Image to Text
+def image_ocr(image_list, req_list=[]):
+    req_info_list = []
+    for img in image_list:
+        text = tesseract.image_to_string(img, config=r'--psm 6')
+        # print("Text from Image")
+        # print(text.lower())
+
+        text_file = open(filename.split('.')[0] + "_ocr.txt", "w")
+        n = text_file.write(text)
+        text_file.close()
+
+        ocr_list = text.lower().split('\n')
+        # print(ocr_list)
+        req_info = {}
+        print("Looking for terms in the required list...")
+        for item in ocr_list:
+            for key in req_list:
+                key = key.lower()
+                if key in item:
+                    s1 = item
+                    s2 = key
+                    info = s1[s1.index(s2) + len(s2) + 1:]
+                    req_info[key] = info
+        if bool(req_info):
+            print("Term Matches Found: ")
+        req_info_list.append(req_info)
+
+    print(req_info_list)
+    return req_info_list
+
+
+oriented_images_list = orient_image(images)
+info_list = image_ocr(oriented_images_list,
+                      req_list=['TOTAL MASS OF SCREEN & SUBFRAME', 'STATIC LOAD PER SUPPORT POINT',
+                                'SPRING CONSTANT OF FOUNDATION BUFFER', 'OPERATING SPEED'])
 
 # Image to searchable PDF
 # pdf = tesseract.image_to_pdf_or_hocr(filename, extension='pdf')
