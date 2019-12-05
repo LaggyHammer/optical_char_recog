@@ -5,12 +5,13 @@ from pdf2image import convert_from_bytes
 tesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
+# PDF to Image Function
 def pdf_to_image():
     file_dict = {}
     take_filenames = True
     while take_filenames:
         filename = input("Enter PDF File name: ") + '.pdf'  # Filename Input
-        images = convert_from_bytes(open(filename, 'rb').read()) # Image Conversion
+        images = convert_from_bytes(open(filename, 'rb').read())  # Image Conversion
         file_dict[filename] = images
         cont_input = input("Continue inputting file names? [y/n] :")
         if cont_input.lower() == 'n':
@@ -68,7 +69,9 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
 
 
 # Image to Text
-def image_ocr(image_dict, req_list=[]):
+def image_ocr(image_dict, req_list=None):
+    if req_list is None:
+        req_list = []
     req_info_dict = {}
 
     for filename in image_dict.keys():
