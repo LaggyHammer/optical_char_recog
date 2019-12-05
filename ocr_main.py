@@ -16,7 +16,7 @@ def orient_image(image_list, orientation_threshold=0.5, script_threshold=0.5):
     oriented_images = []
     image_counter = 1
     for img in image_list:
-        print("Handling Orientation for image " + str(image_counter) + "...")
+        print("Handling Orientation for image " + str(image_counter) + " of " + str(len(image_list))+ "...")
         info = tesseract.image_to_osd(img)  # Orientation Info
 
         # Aspect Ratio Check
