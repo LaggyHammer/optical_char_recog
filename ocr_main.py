@@ -49,27 +49,38 @@ def orient_image(image_list, orientation_threshold=0.5, script_threshold=0.5):
         oriented_images.append(img)
     return oriented_images
 
-# # Image to Text
-# text = tesseract.image_to_string(img, config=r'--psm 6')
-# print("Text from Image")
-# print(text.lower())
-# text_file = open(filename.split('.')[0] + "_ocr.txt", "w")
-# n = text_file.write(text)
-# text_file.close()
-#
-# ocr_list = text.lower().split('\n')
-# print(ocr_list)
-# req_list = ['bridas','acoplamientos','tornilleria externa','presion de diseno interna']
-# req_info = {}
-# for item in ocr_list:
-#     for key in req_list:
-#         if key in item:
-#             s1 = item
-#             s2 = key
-#             info = s1[s1.index(s2) + len(s2) + 1:]
-#             req_info[key] = info
-#
-# print(req_info)
+
+# Image to Text
+def image_ocr(image_list, req_list=[]):
+    req_info_list = []
+    for img in image_list:
+        text = tesseract.image_to_string(img, config=r'--psm 6')
+        print("Text from Image")
+        print(text.lower())
+
+        text_file = open(filename.split('.')[0] + "_ocr.txt", "w")
+        n = text_file.write(text)
+        text_file.close()
+
+        ocr_list = text.lower().split('\n')
+        #print(ocr_list)
+        req_info = {}
+        for item in ocr_list:
+            for key in req_list:
+                key = key.lower()
+                if key in item:
+                    s1 = item
+                    s2 = key
+                    info = s1[s1.index(s2) + len(s2) + 1:]
+                    req_info[key] = info
+        req_info_list.append(req_info)
+
+    print(req_info_list)
+    return req_info_list
+
+
+oriented_images_list = orient_image(images)
+info_list = image_ocr(oriented_images_list, req_list= ['TOTAL MASS OF SCREEN & SUBFRAME','STATIC LOAD PER SUPPORT POINT','SPRING CONSTANT OF FOUNDATION BUFFER'])
 
 # Image to searchable PDF
 # pdf = tesseract.image_to_pdf_or_hocr(filename, extension='pdf')
