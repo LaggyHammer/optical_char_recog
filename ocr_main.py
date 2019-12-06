@@ -107,6 +107,7 @@ def image_ocr(image_dict, req_list=None):
     return req_info_dict
 
 
+# Writing Output to Excel
 def dict_to_excel(ocr_info_dict):
     with ExcelWriter('ocr_output.xlsx') as writer:
         for filename, info in ocr_info_dict.items():
