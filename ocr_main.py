@@ -1,5 +1,8 @@
 import pytesseract as tesseract
 from pdf2image import convert_from_bytes
+import csv
+import pandas as pd
+from pandas import ExcelWriter
 
 # Tesseract OCR File Path
 tesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -104,11 +107,31 @@ def image_ocr(image_dict, req_list=None):
     return req_info_dict
 
 
+def dict_to_excel(ocr_info_dict):
+    # for filename, info in ocr_info_dict.items():
+    #     with open(filename.split('.')[0] + '.csv', 'w') as output:
+    #         writer = csv.writer(output)
+    #         for key, value in info.items():
+    #             writer.writerow([key, value])
+
+    with ExcelWriter('ocr_output.xlsx') as writer:
+        for filename, info in ocr_info_dict.items():
+            print("Output for " + filename + ": \n")
+            df = pd.DataFrame(data=info, index=[0])
+            df = df.T
+            print(df)
+            df.to_excel(writer, sheet_name=filename.split('.')[0])
+
+
+
+
+
 converted_images_dict = pdf_to_image()
 oriented_images_dict = orient_image(converted_images_dict)
 info_list = image_ocr(oriented_images_dict,
                       req_list=['TOTAL MASS OF SCREEN & SUBFRAME', 'STATIC LOAD PER SUPPORT POINT',
                                 'SPRING CONSTANT OF FOUNDATION BUFFER', 'OPERATING SPEED'])
+dict_to_excel(info_list)
 
 # Image to searchable PDF
 # pdf = tesseract.image_to_pdf_or_hocr(filename, extension='pdf')
