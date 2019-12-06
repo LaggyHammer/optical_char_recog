@@ -1,6 +1,5 @@
 import pytesseract as tesseract
 from pdf2image import convert_from_bytes
-import csv
 import pandas as pd
 from pandas import ExcelWriter
 
