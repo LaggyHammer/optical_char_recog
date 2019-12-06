@@ -63,7 +63,7 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
                 if script_confidence > script_threshold and orientation_confidence > orientation_threshold:
                     img = img.rotate(rotation_angle, expand=True)
 
-            img.show()
+            # img.show()  # Enable when debugging
             oriented_images[filename] = img
 
     if oriented_images:
@@ -108,22 +108,14 @@ def image_ocr(image_dict, req_list=None):
 
 
 def dict_to_excel(ocr_info_dict):
-    # for filename, info in ocr_info_dict.items():
-    #     with open(filename.split('.')[0] + '.csv', 'w') as output:
-    #         writer = csv.writer(output)
-    #         for key, value in info.items():
-    #             writer.writerow([key, value])
-
     with ExcelWriter('ocr_output.xlsx') as writer:
         for filename, info in ocr_info_dict.items():
             print("Output for " + filename + ": \n")
             df = pd.DataFrame(data=info, index=[0])
             df = df.T
             print(df)
+            print("Writing to Excel...")
             df.to_excel(writer, sheet_name=filename.split('.')[0])
-
-
-
 
 
 converted_images_dict = pdf_to_image()
