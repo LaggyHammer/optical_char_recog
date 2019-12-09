@@ -123,7 +123,7 @@ oriented_images_dict = orient_image(converted_images_dict)
 info_list = image_ocr(oriented_images_dict,
                       req_list=['TOTAL MASS OF SCREEN & SUBFRAME', 'STATIC LOAD PER SUPPORT POINT',
                                 'SPRING CONSTANT OF FOUNDATION BUFFER', 'OPERATING SPEED'])
-dict_to_excel(info_list)
+#dict_to_excel(info_list)
 
 # Image to searchable PDF
 # pdf = tesseract.image_to_pdf_or_hocr(filename, extension='pdf')
