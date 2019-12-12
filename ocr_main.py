@@ -2,9 +2,6 @@ import pytesseract as tesseract
 from pdf2image import convert_from_bytes
 import pandas as pd
 from pandas import ExcelWriter
-from fuzzysearch import find_near_matches
-import itertools
-import re
 from search_functions import *
 
 # Tesseract OCR File Path
@@ -92,17 +89,6 @@ def image_ocr(image_dict):
 
         req_info = {}
         print("Looking for keywords...")
-        # for item in ocr_list:
-        #     for key in req_list:
-        #         key = key.lower()
-        #         if key in item:
-        #             s1 = item
-        #             s2 = key
-        #             info = s1[s1.index(s2) + len(s2) + 1:]
-        #             req_info[key] = info
-        # if bool(req_info):
-        #     print("Term Matches Found: ")
-        # req_info_dict[filename] = req_info
         text = text.lower()
         req_info['Total Mass'] = find_total_mass(text)
         req_info['Static Load'] = find_static_load(text)
