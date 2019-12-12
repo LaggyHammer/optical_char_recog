@@ -2,6 +2,10 @@ import pytesseract as tesseract
 from pdf2image import convert_from_bytes
 import pandas as pd
 from pandas import ExcelWriter
+from fuzzysearch import find_near_matches
+import itertools
+import re
+from search_functions import *
 
 # Tesseract OCR File Path
 tesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -71,35 +75,41 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
 
 
 # Image to Text
-def image_ocr(image_dict, req_list=None):
-    if req_list is None:
-        req_list = []
+def image_ocr(image_dict):
     req_info_dict = {}
 
     for filename in image_dict.keys():
         img = image_dict[filename]
+        print("Recognizing Text in " + filename + "...")
         text = tesseract.image_to_string(img, config=r'--psm 6')
         # print("Text from Image")
         # print(text.lower())
 
+        print("Writing Text to file...")
         text_file = open(filename.split('.')[0] + "_ocr.txt", "w")
         n = text_file.write(text)
         text_file.close()
 
-        ocr_list = text.lower().split('\n')
-        # print(ocr_list)
         req_info = {}
-        print("Looking for terms in the required list...")
-        for item in ocr_list:
-            for key in req_list:
-                key = key.lower()
-                if key in item:
-                    s1 = item
-                    s2 = key
-                    info = s1[s1.index(s2) + len(s2) + 1:]
-                    req_info[key] = info
-        if bool(req_info):
-            print("Term Matches Found: ")
+        print("Looking for keywords...")
+        # for item in ocr_list:
+        #     for key in req_list:
+        #         key = key.lower()
+        #         if key in item:
+        #             s1 = item
+        #             s2 = key
+        #             info = s1[s1.index(s2) + len(s2) + 1:]
+        #             req_info[key] = info
+        # if bool(req_info):
+        #     print("Term Matches Found: ")
+        # req_info_dict[filename] = req_info
+        text = text.lower()
+        req_info['Total Mass'] = find_total_mass(text)
+        req_info['Static Load'] = find_static_load(text)
+        req_info['Spring Constant'] = find_spring_constant(text)
+        req_info['Operating Speed'] = find_operating_speed(text)
+        req_info['Dynamic Loads'] = find_dynamic_loads(text)
+
         req_info_dict[filename] = req_info
 
     print(req_info_dict)
@@ -120,10 +130,8 @@ def dict_to_excel(ocr_info_dict):
 
 converted_images_dict = pdf_to_image()
 oriented_images_dict = orient_image(converted_images_dict)
-info_list = image_ocr(oriented_images_dict,
-                      req_list=['TOTAL MASS OF SCREEN & SUBFRAME', 'STATIC LOAD PER SUPPORT POINT',
-                                'SPRING CONSTANT OF FOUNDATION BUFFER', 'OPERATING SPEED'])
-dict_to_excel(info_list)
+info_list = image_ocr(oriented_images_dict)
+#dict_to_excel(info_list)
 
 # Image to searchable PDF
 # pdf = tesseract.image_to_pdf_or_hocr(filename, extension='pdf')
