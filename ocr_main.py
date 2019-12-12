@@ -120,7 +120,7 @@ def dict_to_excel(ocr_info_dict):
 converted_images_dict = pdf_to_image()
 oriented_images_dict = orient_image(converted_images_dict)
 info_list = image_ocr(oriented_images_dict)
-dict_to_excel(info_list)
+#dict_to_excel(info_list)
 
 # Image to searchable PDF
 # pdf = tesseract.image_to_pdf_or_hocr(filename, extension='pdf')
