@@ -121,7 +121,10 @@ def dict_to_excel(ocr_info_dict):
     with ExcelWriter('ocr_output.xlsx') as writer:
         for filename, info in ocr_info_dict.items():
             print("Output for " + filename + ": \n")
-            df = pd.DataFrame(data=info, index=[0])
+            columns = list(info.keys())
+            rows = list(info.values())
+            df = pd.DataFrame(columns=columns)
+            df.loc[len(df)] = rows
             df = df.T
             print(df)
             print("Writing to Excel...")
@@ -131,7 +134,7 @@ def dict_to_excel(ocr_info_dict):
 converted_images_dict = pdf_to_image()
 oriented_images_dict = orient_image(converted_images_dict)
 info_list = image_ocr(oriented_images_dict)
-#dict_to_excel(info_list)
+dict_to_excel(info_list)
 
 # Image to searchable PDF
 # pdf = tesseract.image_to_pdf_or_hocr(filename, extension='pdf')
