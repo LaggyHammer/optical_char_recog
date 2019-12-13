@@ -27,21 +27,6 @@ def pdf_to_image(file_list):
 
     return file_dict
 
-    # take_filenames = True
-    # while take_filenames:
-    #     filename = input("Enter PDF File name: ") + '.pdf'  # Filename Input
-    #     images = convert_from_bytes(open(filename, 'rb').read())  # Image Conversion
-    #     file_dict[filename] = images
-    #     cont_input = input("Continue inputting file names? [y/n] :")
-    #     if cont_input.lower() == 'n':
-    #         take_filenames = False
-    #     elif cont_input.lower() == 'y':
-    #         continue
-    #     else:
-    #         print("Non-valid Input")
-    #
-    # return file_dict
-
 
 # Orientation Handling
 def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
@@ -88,8 +73,8 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
     return oriented_images
 
 
-# Image to Text
-def image_ocr(image_dict):
+# Image to Text (Main OCR)
+def image_ocr(image_dict, write_to_file=False, searchable_pdf=False):
     req_info_dict = {}
 
     for filename in image_dict.keys():
@@ -99,11 +84,21 @@ def image_ocr(image_dict):
         # print("Text from Image")
         # print(text.lower())
 
-        print("Writing Text to file...")
-        output_folder = 'Output'
-        text_file = open(output_folder + '/' + filename.split('.')[0].split('/')[1] + "_ocr.txt", "w")
-        n = text_file.write(text)
-        text_file.close()
+        if write_to_file:
+            print("Writing Text to file...")
+            output_folder = 'Output'
+            text_file = open(output_folder + '/' + filename.split('.')[0].split('/')[1] + "_ocr.txt", "w")
+            n = text_file.write(text)
+            text_file.close()
+
+        # Image to searchable PDF
+        if searchable_pdf:
+            print("Writing Searchable PDF...")
+            output_folder = 'Output'
+            pdf = tesseract.image_to_pdf_or_hocr(img, extension='pdf')
+            f = open(output_folder + '/' + filename.split('.')[0].split('/')[1] + ".pdf", "w+b")
+            f.write(bytearray(pdf))
+            f.close()
 
         req_info = {}
         print("Looking for keywords...")
@@ -115,6 +110,7 @@ def image_ocr(image_dict):
         req_info['Dynamic Loads'] = find_dynamic_loads(text)
 
         req_info_dict[filename] = req_info
+        print("Done")
 
     # print(req_info_dict)
 
@@ -125,6 +121,7 @@ def image_ocr(image_dict):
 def dict_to_excel(ocr_info_dict):
     with ExcelWriter('Output/ocr_output.xlsx') as writer:
         for filename, info in ocr_info_dict.items():
+            print("Writing to Excel...")
             print("Output for " + filename + ": \n")
             columns = list(info.keys())
             rows = list(info.values())
@@ -132,19 +129,25 @@ def dict_to_excel(ocr_info_dict):
             df.loc[len(df)] = rows
             df = df.T
             print(df)
-            print("Writing to Excel...")
             df.to_excel(writer, sheet_name=filename.split('.')[0].split('/')[1])
 
 
-file_list = read_file_names('Input')
-converted_images_dict = pdf_to_image(file_list)
-oriented_images_dict = orient_image(converted_images_dict)
-info_list = image_ocr(oriented_images_dict)
-dict_to_excel(info_list)
+# Main Execution Function (Call this!)
+def execute_main(input_folder='Input', write_to_file=False, searchable_pdf=False):
+    print("Reading Files...(1/5)")
+    file_list = read_file_names(input_folder)
+
+    print("Converting to Image...(2/5)")
+    converted_images_dict = pdf_to_image(file_list)
+
+    print("Orienting Images...(3/5)")
+    oriented_images_dict = orient_image(converted_images_dict)
+
+    print("Commencing OCR...(4/5)")
+    info_list = image_ocr(oriented_images_dict, write_to_file, searchable_pdf)
+
+    print("Publishing Results to Excel...(5/5)")
+    dict_to_excel(info_list)
 
 
-# Image to searchable PDF
-# pdf = tesseract.image_to_pdf_or_hocr(filename, extension='pdf')
-# f = open(filename.split('.')[0] + ".pdf", "w+b")
-# f.write(bytearray(pdf))
-# f.close()
+execute_main(write_to_file=True, searchable_pdf=True)
