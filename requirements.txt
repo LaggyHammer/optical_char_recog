@@ -1,4 +1,6 @@
-pytesseract==0.3.0
-Pillow==6.2.0
-pdf2image==1.10.0
-nltk==3.4.5
+fuzzysearch
+pytesseract
+pdf2image
+nltk
+pandas
+
