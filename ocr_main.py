@@ -3,28 +3,44 @@ from pdf2image import convert_from_bytes
 import pandas as pd
 from pandas import ExcelWriter
 from search_functions import *
+import os
 
 # Tesseract OCR File Path
 tesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
+# Read File Names from Folder
+def read_file_names(folder_name='Input'):
+    filename_list = os.listdir(folder_name)
+    filename_list = [folder_name + '/' + file for file in filename_list]
+
+    return filename_list
+
+
 # PDF to Image Function
-def pdf_to_image():
+def pdf_to_image(file_list):
     file_dict = {}
-    take_filenames = True
-    while take_filenames:
-        filename = input("Enter PDF File name: ") + '.pdf'  # Filename Input
+    for filename in file_list:
+        print("Converting " + filename + " to image..")
         images = convert_from_bytes(open(filename, 'rb').read())  # Image Conversion
         file_dict[filename] = images
-        cont_input = input("Continue inputting file names? [y/n] :")
-        if cont_input.lower() == 'n':
-            take_filenames = False
-        elif cont_input.lower() == 'y':
-            continue
-        else:
-            print("Non-valid Input")
 
     return file_dict
+
+    # take_filenames = True
+    # while take_filenames:
+    #     filename = input("Enter PDF File name: ") + '.pdf'  # Filename Input
+    #     images = convert_from_bytes(open(filename, 'rb').read())  # Image Conversion
+    #     file_dict[filename] = images
+    #     cont_input = input("Continue inputting file names? [y/n] :")
+    #     if cont_input.lower() == 'n':
+    #         take_filenames = False
+    #     elif cont_input.lower() == 'y':
+    #         continue
+    #     else:
+    #         print("Non-valid Input")
+    #
+    # return file_dict
 
 
 # Orientation Handling
@@ -68,6 +84,7 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
 
     if oriented_images:
         print("Orientation Handling Successful")
+
     return oriented_images
 
 
@@ -83,7 +100,8 @@ def image_ocr(image_dict):
         # print(text.lower())
 
         print("Writing Text to file...")
-        text_file = open(filename.split('.')[0] + "_ocr.txt", "w")
+        output_folder = 'Output'
+        text_file = open(output_folder + '/' + filename.split('.')[0].split('/')[1] + "_ocr.txt", "w")
         n = text_file.write(text)
         text_file.close()
 
@@ -98,13 +116,14 @@ def image_ocr(image_dict):
 
         req_info_dict[filename] = req_info
 
-    print(req_info_dict)
+    # print(req_info_dict)
+
     return req_info_dict
 
 
 # Writing Output to Excel
 def dict_to_excel(ocr_info_dict):
-    with ExcelWriter('ocr_output.xlsx') as writer:
+    with ExcelWriter('Output/ocr_output.xlsx') as writer:
         for filename, info in ocr_info_dict.items():
             print("Output for " + filename + ": \n")
             columns = list(info.keys())
@@ -114,13 +133,14 @@ def dict_to_excel(ocr_info_dict):
             df = df.T
             print(df)
             print("Writing to Excel...")
-            df.to_excel(writer, sheet_name=filename.split('.')[0])
+            df.to_excel(writer, sheet_name=filename.split('.')[0].split('/')[1])
 
 
-converted_images_dict = pdf_to_image()
+file_list = read_file_names('Input')
+converted_images_dict = pdf_to_image(file_list)
 oriented_images_dict = orient_image(converted_images_dict)
 info_list = image_ocr(oriented_images_dict)
-#dict_to_excel(info_list)
+dict_to_excel(info_list)
 
 # Image to searchable PDF
 # pdf = tesseract.image_to_pdf_or_hocr(filename, extension='pdf')
