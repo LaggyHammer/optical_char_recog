@@ -34,14 +34,17 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
     for filename in image_dict.keys():
         for img in image_dict[filename]:
             print("Handling Orientation for image " + filename + "...")
-            info = tesseract.image_to_osd(img)  # Orientation Info
-
+            
             # Aspect Ratio Check
             (width, height) = img.size
             if height > width:
                 img = img.rotate(90, expand=True)
                 info = tesseract.image_to_osd(img)  # Orientation Info
                 # print(info)
+                
+            else:
+                info = tesseract.image_to_osd(img)  # Orientation Info
+                
             info = info.split('\n')
 
             # Rotation Angle (0 or 180)
