@@ -7,8 +7,10 @@ import os
 from progress.bar import ChargingBar
 import time
 
+
 # Tracking Time
 start_time = time.time()
+
 
 # Tesseract OCR File Path
 tesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -93,7 +95,7 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
 
 
 # Image to Text (Main OCR)
-def image_ocr(image_dict, write_to_file=False, searchable_pdf=False):
+def image_ocr(image_dict, write_to_file, searchable_pdf):
     req_info_dict = {}
 
     bar = ChargingBar(" Processing OCR", max=len(image_dict))
