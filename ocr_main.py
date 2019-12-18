@@ -5,6 +5,11 @@ from pandas import ExcelWriter
 from search_functions import *
 import os
 from progress.bar import ChargingBar
+import time
+
+
+start_time = time.time()
+print("--- %s seconds ---" % (time.time() - start_time))
 
 # Tesseract OCR File Path
 tesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -30,6 +35,8 @@ def pdf_to_image(file_list):
 
         bar.next()
     bar.finish()
+
+    print("\n Conversion Successful")
 
     return file_dict
 
@@ -129,6 +136,7 @@ def image_ocr(image_dict, write_to_file=False, searchable_pdf=False):
     bar.finish()
 
     # print(req_info_dict)
+    print("\n OCR Successful")
 
     return req_info_dict
 
@@ -150,24 +158,37 @@ def dict_to_excel(ocr_info_dict):
             bar.next()
         bar.finish()
 
+    print("\n Output Successful")
+
 
 # Main Execution Function (Call this!)
 def main(input_folder='Input', write_to_file=False, searchable_pdf=False):
     print("\n (Step 1 of 5) Reading Files...")
     file_list = read_file_names(input_folder)
+    read_time = time.time()
+    print("Read " + str(len(file_list)) + " files in ""%s seconds" % (read_time - start_time))
 
     print("\n (Step 2 of 5) Converting to Image...")
     converted_images_dict = pdf_to_image(file_list)
+    convert_time = time.time()
+    print("Converted " + str(len(converted_images_dict)) + " files in ""%s seconds" % (convert_time - read_time))
 
     print("\n (Step 3 of 5) Orienting Images...")
     oriented_images_dict = orient_image(converted_images_dict)
+    orient_time = time.time()
+    print("Oriented " + str(len(oriented_images_dict)) + " images in ""%s seconds" % (orient_time - convert_time))
 
     print("\n (Step 4 of 5) Commencing OCR...")
     info_list = image_ocr(oriented_images_dict, write_to_file, searchable_pdf)
+    ocr_time = time.time()
+    print("Passed " + str(len(info_list)) + " files through OCR in ""%s seconds" % (ocr_time - orient_time))
 
     print("\n (Step 5 of 5) Publishing Results to Excel...")
     dict_to_excel(info_list)
+    result_time = time.time()
+    print("Published results in ""%s seconds" % (result_time - ocr_time))
 
 
 if __name__ == "__main__":
     main(write_to_file=False, searchable_pdf=False)
+    print("Total time to run: ""%s seconds" % (time.time() - start_time))
