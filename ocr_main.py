@@ -133,7 +133,7 @@ def dict_to_excel(ocr_info_dict):
 
 
 # Main Execution Function (Call this!)
-def execute_main(input_folder='Input', write_to_file=False, searchable_pdf=False):
+def main(input_folder='Input', write_to_file=False, searchable_pdf=False):
     print("Reading Files...(1/5)")
     file_list = read_file_names(input_folder)
 
@@ -150,4 +150,6 @@ def execute_main(input_folder='Input', write_to_file=False, searchable_pdf=False
     dict_to_excel(info_list)
 
 
-execute_main(write_to_file=True, searchable_pdf=True)
+if __name__ == "__main__":
+
+    main(write_to_file=True, searchable_pdf=True)
