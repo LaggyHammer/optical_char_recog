@@ -7,9 +7,8 @@ import os
 from progress.bar import ChargingBar
 import time
 
-
+# Tracking Time
 start_time = time.time()
-print("--- %s seconds ---" % (time.time() - start_time))
 
 # Tesseract OCR File Path
 tesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -29,7 +28,7 @@ def pdf_to_image(file_list):
     bar = ChargingBar(" Processing Image Conversion", max=len(file_list))
 
     for filename in file_list:
-        # print("Converting " + filename + " to image..")
+        # print("Converting " + filename + " to image..") # debug
         images = convert_from_bytes(open(filename, 'rb').read())  # Image Conversion
         file_dict[filename] = images
 
@@ -47,14 +46,14 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
     bar = ChargingBar(" Processing Orientation", max=len(image_dict))
     for filename in image_dict.keys():
         for img in image_dict[filename]:
-            # print("Handling Orientation for image " + filename + "...")
+            # print("Handling Orientation for image " + filename + "...") # debug
 
             # Aspect Ratio Check
             (width, height) = img.size
             if height > width:
                 img = img.rotate(90, expand=True)
                 info = tesseract.image_to_osd(img)  # Orientation Info
-                # print(info)
+                # print(info) # debug
 
             else:
                 info = tesseract.image_to_osd(img)  # Orientation Info
@@ -81,7 +80,7 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
                 if script_confidence > script_threshold and orientation_confidence > orientation_threshold:
                     img = img.rotate(rotation_angle, expand=True)
 
-            # img.show()  # Enable when debugging
+            # img.show() # debug
             oriented_images[filename] = img
 
         bar.next()
@@ -100,13 +99,13 @@ def image_ocr(image_dict, write_to_file=False, searchable_pdf=False):
     bar = ChargingBar(" Processing OCR", max=len(image_dict))
     for filename in image_dict.keys():
         img = image_dict[filename]
-        # print("Recognizing Text in " + filename + "...")
+        # print("Recognizing Text in " + filename + "...") # debug
         text = tesseract.image_to_string(img, config=r'--psm 6')
-        # print("Text from Image")
-        # print(text.lower())
+        # print("Text from Image") # debug
+        # print(text.lower()) # debug
 
         if write_to_file:
-            # print("Writing Text to file...")
+            # print("Writing Text to file...") # debug
             output_folder = 'Output'
             text_file = open(output_folder + '/' + filename.split('.')[0].split('/')[1] + "_ocr.txt", "w")
             n = text_file.write(text)
@@ -114,7 +113,7 @@ def image_ocr(image_dict, write_to_file=False, searchable_pdf=False):
 
         # Image to searchable PDF
         if searchable_pdf:
-            # print("Writing Searchable PDF...")
+            # print("Writing Searchable PDF...") # debug
             output_folder = 'Output'
             pdf = tesseract.image_to_pdf_or_hocr(img, extension='pdf')
             f = open(output_folder + '/' + filename.split('.')[0].split('/')[1] + ".pdf", "w+b")
@@ -122,7 +121,7 @@ def image_ocr(image_dict, write_to_file=False, searchable_pdf=False):
             f.close()
 
         req_info = {}
-        # print("Looking for keywords...")
+        # print("Looking for keywords...") # debug
         text = text.lower()
         req_info['Total Mass'] = find_total_mass(text)
         req_info['Static Load'] = find_static_load(text)
@@ -131,7 +130,7 @@ def image_ocr(image_dict, write_to_file=False, searchable_pdf=False):
         req_info['Dynamic Loads'] = find_dynamic_loads(text)
 
         req_info_dict[filename] = req_info
-        # print("Done")
+        # print("Done") # debug
         bar.next()
     bar.finish()
 
@@ -146,14 +145,14 @@ def dict_to_excel(ocr_info_dict):
     with ExcelWriter('Output/ocr_output.xlsx') as writer:
         bar = ChargingBar(" Processing Output", max=len(ocr_info_dict))
         for filename, info in ocr_info_dict.items():
-            # print("Writing to Excel...")
-            # print("Output for " + filename + ": \n")
+            # print("Writing to Excel...") # debug
+            # print("Output for " + filename + ": \n") # debug
             columns = list(info.keys())
             rows = list(info.values())
             df = pd.DataFrame(columns=columns)
             df.loc[len(df)] = rows
             df = df.T
-            # print(df)
+            # print(df) # debug
             df.to_excel(writer, sheet_name=filename.split('.')[0].split('/')[1])
             bar.next()
         bar.finish()
@@ -191,4 +190,4 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False):
 
 if __name__ == "__main__":
     main(write_to_file=False, searchable_pdf=False)
-    print("Total time to run: ""%s seconds" % (time.time() - start_time))
+    print("\n Total time to run: ""%s seconds" % (time.time() - start_time))
