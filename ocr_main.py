@@ -7,10 +7,8 @@ import os
 from progress.bar import ChargingBar
 import time
 
-
 # Tracking Time
 start_time = time.time()
-
 
 # Tesseract OCR File Path
 tesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -136,7 +134,7 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
         bar.next()
     bar.finish()
 
-    # print(req_info_dict)
+    # print(req_info_dict) # debug
     print("\n OCR Successful")
 
     return req_info_dict
@@ -149,10 +147,26 @@ def dict_to_excel(ocr_info_dict):
         for filename, info in ocr_info_dict.items():
             # print("Writing to Excel...") # debug
             # print("Output for " + filename + ": \n") # debug
-            columns = list(info.keys())
-            rows = list(info.values())
-            df = pd.DataFrame(columns=columns)
-            df.loc[len(df)] = rows
+
+            # Finding the largest column
+            columns_length = 1
+            for key in list(info.keys()):
+                if len(info[key]) > columns_length:
+                    max_length_column = key
+                    columns_length = len(info[key])
+
+            # Initiating DataFrame with the largest column
+            df = pd.DataFrame()
+            df[max_length_column] = pd.Series(info[max_length_column])
+
+            # Adding other columns
+            for key in list(info.keys()):
+                df[key] = pd.Series(info[key])
+
+            # Rearranging Columns
+            df = df[['Total Mass', 'Static Load', 'Spring Constant', 'Operating Speed', 'Dynamic Loads']]
+
+            # Transposing DataFrame
             df = df.T
             # print(df) # debug
             df.to_excel(writer, sheet_name=filename.split('.')[0].split('/')[1])
