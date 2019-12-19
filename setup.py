@@ -10,7 +10,7 @@ setup(
     author_email='ankch24@gmail.com',
     description='Reads keywords from Screen Drawings and writes them to Excel',
     classifiers=['Programming Language::Python::3.7'],
-    include_package_data=True
+    include_package_data=True,
     install_requires=[
           'fuzzysearch',
         'pytesseract',
@@ -18,6 +18,6 @@ setup(
         'pdf2image',
         'nltk',
         'pandas'
-      ],
+      ]
 
-)
+    )
