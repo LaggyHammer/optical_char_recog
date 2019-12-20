@@ -1,4 +1,4 @@
-progress
+PySimpleGUI
 fuzzysearch
 pytesseract
 pdf2image

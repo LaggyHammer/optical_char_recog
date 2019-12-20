@@ -4,8 +4,8 @@ import pandas as pd
 from pandas import ExcelWriter
 from search_functions import *
 import os
-from progress.bar import ChargingBar
 import time
+import PySimpleGUI as sg
 
 # Tracking Time
 start_time = time.time()
@@ -25,16 +25,33 @@ def read_file_names(folder_name='Input'):
 # PDF to Image Function
 def pdf_to_image(file_list):
     file_dict = {}
-    bar = ChargingBar(" Processing Image Conversion", max=len(file_list))
+
+    # Progress Bar Window
+    layout = [[sg.Text('Converting PDF to Image')],
+              [sg.ProgressBar(len(file_list), orientation='h', size=(20, 2), key='progressbar')],
+              [sg.Cancel()]]
+    window = sg.Window('Progress', layout)
+    progress_bar = window['progressbar']
+    i = 1
 
     for filename in file_list:
+
+        # window interaction
+        event, values = window.read(timeout=10)
+        if event == 'Cancel' or event is None:
+            break
+        if i == 1:
+            progress_bar.UpdateBar(0)
+
         # print("Converting " + filename + " to image..") # debug
         images = convert_from_bytes(open(filename, 'rb').read())  # Image Conversion
         file_dict[filename] = images
 
-        bar.next()
-    bar.finish()
+        # progress bar increment
+        progress_bar.UpdateBar(i)
+        i += 1
 
+    window.close()
     print("\n Conversion Successful")
 
     return file_dict
@@ -43,10 +60,28 @@ def pdf_to_image(file_list):
 # Orientation Handling
 def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
     oriented_images = {}
-    bar = ChargingBar(" Processing Orientation", max=len(image_dict))
+
+    # Progress Bar Window
+    layout = [[sg.Text('Orienting Images')],
+              [sg.ProgressBar(len(image_dict), orientation='h', size=(20, 2), key='progressbar')],
+              [sg.Cancel()]]
+    window = sg.Window('Progress', layout)
+    progress_bar = window['progressbar']
+    i = 1
+
     for filename in image_dict.keys():
+
+        # window interaction
+        event, values = window.read(timeout=10)
+        if event == 'Cancel' or event is None:
+            break
+        if i == 1:
+            progress_bar.UpdateBar(0)
+
         for img in image_dict[filename]:
             # print("Handling Orientation for image " + filename + "...") # debug
+
+
 
             # Aspect Ratio Check
             (width, height) = img.size
@@ -83,8 +118,11 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
             # img.show() # debug
             oriented_images[filename] = img
 
-        bar.next()
-    bar.finish()
+        # progress bar increment
+        progress_bar.UpdateBar(i)
+        i += 1
+
+    window.close()
 
     if oriented_images:
         print("\n Orientation Handling Successful")
@@ -96,8 +134,22 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
 def image_ocr(image_dict, write_to_file, searchable_pdf):
     req_info_dict = {}
 
-    bar = ChargingBar(" Processing OCR", max=len(image_dict))
+    layout = [[sg.Text('Recognizing Text')],
+              [sg.ProgressBar(len(image_dict), orientation='h', size=(20, 2), key='progressbar')],
+              [sg.Cancel()]]
+    window = sg.Window('Progress', layout)
+    progress_bar = window['progressbar']
+    i = 1
+
     for filename in image_dict.keys():
+
+        # window interaction
+        event, values = window.read(timeout=10)
+        if event == 'Cancel' or event is None:
+            break
+        if i == 1:
+            progress_bar.UpdateBar(0)
+
         img = image_dict[filename]
         # print("Recognizing Text in " + filename + "...") # debug
         text = tesseract.image_to_string(img, config=r'--psm 6')
@@ -107,7 +159,7 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
         if write_to_file:
             # print("Writing Text to file...") # debug
             output_folder = 'Output'
-            text_file = open(output_folder + '/' + filename.split('.')[0].split('/')[1] + "_ocr.txt", "w")
+            text_file = open(output_folder + '/' + filename.split('.')[0].split('/')[-1] + "_ocr.txt", "w")
             n = text_file.write(text)
             text_file.close()
 
@@ -116,7 +168,7 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
             # print("Writing Searchable PDF...") # debug
             output_folder = 'Output'
             pdf = tesseract.image_to_pdf_or_hocr(img, extension='pdf')
-            f = open(output_folder + '/' + filename.split('.')[0].split('/')[1] + ".pdf", "w+b")
+            f = open(output_folder + '/' + filename.split('.')[0].split('/')[-1] + ".pdf", "w+b")
             f.write(bytearray(pdf))
             f.close()
 
@@ -131,8 +183,12 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
 
         req_info_dict[filename] = req_info
         # print("Done") # debug
-        bar.next()
-    bar.finish()
+
+        # progress bar increment
+        progress_bar.UpdateBar(i)
+        i += 1
+
+    window.close()
 
     # print(req_info_dict) # debug
     print("\n OCR Successful")
@@ -143,10 +199,24 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
 # Writing Output to Excel
 def dict_to_excel(ocr_info_dict):
     with ExcelWriter('Output/ocr_output.xlsx') as writer:
-        bar = ChargingBar(" Processing Output", max=len(ocr_info_dict))
+
+        layout = [[sg.Text('Writing to Excel')],
+                  [sg.ProgressBar(len(ocr_info_dict), orientation='h', size=(20, 2), key='progressbar')],
+                  [sg.Cancel()]]
+        window = sg.Window('Progress', layout)
+        progress_bar = window['progressbar']
+        i = 1
+
         for filename, info in ocr_info_dict.items():
             # print("Writing to Excel...") # debug
             # print("Output for " + filename + ": \n") # debug
+
+            # window interaction
+            event, values = window.read(timeout=10)
+            if event == 'Cancel' or event is None:
+                break
+            if i == 1:
+                progress_bar.UpdateBar(0)
 
             # Finding the largest column
             columns_length = 1
@@ -169,15 +239,20 @@ def dict_to_excel(ocr_info_dict):
             # Transposing DataFrame
             df = df.T
             # print(df) # debug
-            df.to_excel(writer, sheet_name=filename.split('.')[0].split('/')[1])
-            bar.next()
-        bar.finish()
+            df.to_excel(writer, sheet_name=filename.split('.')[0].split('/')[-1])
+
+            # progress bar increment
+            progress_bar.UpdateBar(i)
+            i += 1
+
+        window.close()
 
     print("\n Output Successful")
 
 
 # Main Execution Function (Call this!)
-def main(input_folder='Input', write_to_file=False, searchable_pdf=False):
+def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orientation_threshold=0.5,
+         script_threshold=0.5):
     print("\n (Step 1 of 5) Reading Files...")
     file_list = read_file_names(input_folder)
     read_time = time.time()
@@ -189,7 +264,7 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False):
     print("Converted " + str(len(converted_images_dict)) + " files in ""%s seconds" % (convert_time - read_time))
 
     print("\n (Step 3 of 5) Orienting Images...")
-    oriented_images_dict = orient_image(converted_images_dict)
+    oriented_images_dict = orient_image(converted_images_dict, orientation_threshold, script_threshold)
     orient_time = time.time()
     print("Oriented " + str(len(oriented_images_dict)) + " images in ""%s seconds" % (orient_time - convert_time))
 
@@ -202,6 +277,8 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False):
     dict_to_excel(info_list)
     result_time = time.time()
     print("Published results in ""%s seconds" % (result_time - ocr_time))
+
+    sg.Popup("\n Total time to run: ""%s seconds" % (time.time() - start_time), title="OCR Results Published")
 
 
 if __name__ == "__main__":
