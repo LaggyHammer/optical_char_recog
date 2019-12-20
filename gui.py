@@ -1,12 +1,12 @@
 import PySimpleGUI as sg
 
-sg.ChangeLookAndFeel('GreenTan')
+sg.ChangeLookAndFeel('Black')
 
 form = sg.FlexForm('GUI Testing', default_element_size=(40, 1))
 
-column1 = [[sg.Text('Orientation Threshold', background_color='#d3dfda', justification='left', size=(20, 1))],
+column1 = [[sg.Text('Orientation Threshold: ', text_color='#000000', background_color='#ffffff', justification='left', size=(20, 1))],
            [sg.Slider(range=(0, 100), orientation='h', size=(20, 15), default_value=50)]]
-column2 = [[sg.Text('Script Threshold', background_color='#d3dfda', justification='left', size=(20, 1))],
+column2 = [[sg.Text('Script Threshold: ', text_color='#000000', background_color='#ffffff', justification='left', size=(20, 1))],
            [sg.Slider(range=(0, 100), orientation='h', size=(20, 15), default_value=50)]]
 layout = [
     [sg.Text('Screen GA OCR Form', size=(30, 1), font=("Helvetica", 25))],
@@ -18,7 +18,7 @@ layout = [
     [sg.Checkbox('Create Searchable PDF', default=False), sg.Checkbox('Create OCR Text File', default=True)],
     [sg.Text('_' * 80)],
     [sg.Text('Advanced Settings: ')],
-    [sg.Column(column1, background_color='#d3dfda'), sg.Column(column2, background_color='#d3dfda')],
+    [sg.Column(column1, background_color='#ffffff'), sg.Column(column2, background_color='#ffffff')],
     [sg.Text('_' * 80)],
     [sg.Submit()]
 ]
