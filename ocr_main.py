@@ -177,7 +177,7 @@ def dict_to_excel(ocr_info_dict):
 
 
 # Main Execution Function (Call this!)
-def main(input_folder='Input', write_to_file=False, searchable_pdf=False):
+def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orientation_threshold=0.5, script_threshold=0.5):
     print("\n (Step 1 of 5) Reading Files...")
     file_list = read_file_names(input_folder)
     read_time = time.time()
@@ -189,7 +189,7 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False):
     print("Converted " + str(len(converted_images_dict)) + " files in ""%s seconds" % (convert_time - read_time))
 
     print("\n (Step 3 of 5) Orienting Images...")
-    oriented_images_dict = orient_image(converted_images_dict)
+    oriented_images_dict = orient_image(converted_images_dict, orientation_threshold, script_threshold)
     orient_time = time.time()
     print("Oriented " + str(len(oriented_images_dict)) + " images in ""%s seconds" % (orient_time - convert_time))
 
