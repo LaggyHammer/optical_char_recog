@@ -14,10 +14,10 @@ setup(
     install_requires=[
           'fuzzysearch',
         'pytesseract',
-        'progress',
         'pdf2image',
         'nltk',
-        'pandas'
+        'pandas',
+        'PySimpleGUI'
       ]
 
     )

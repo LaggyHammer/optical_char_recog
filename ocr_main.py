@@ -159,7 +159,7 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
         if write_to_file:
             # print("Writing Text to file...") # debug
             output_folder = 'Output'
-            text_file = open(output_folder + '/' + filename.split('.')[0].split('/')[1] + "_ocr.txt", "w")
+            text_file = open(output_folder + '/' + filename.split('.')[0].split('/')[-1] + "_ocr.txt", "w")
             n = text_file.write(text)
             text_file.close()
 
@@ -168,7 +168,7 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
             # print("Writing Searchable PDF...") # debug
             output_folder = 'Output'
             pdf = tesseract.image_to_pdf_or_hocr(img, extension='pdf')
-            f = open(output_folder + '/' + filename.split('.')[0].split('/')[1] + ".pdf", "w+b")
+            f = open(output_folder + '/' + filename.split('.')[0].split('/')[-1] + ".pdf", "w+b")
             f.write(bytearray(pdf))
             f.close()
 
@@ -277,6 +277,8 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
     dict_to_excel(info_list)
     result_time = time.time()
     print("Published results in ""%s seconds" % (result_time - ocr_time))
+
+    sg.Popup("\n Total time to run: ""%s seconds" % (time.time() - start_time), title="OCR Results Published")
 
 
 if __name__ == "__main__":
