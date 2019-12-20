@@ -3,7 +3,7 @@ from ocr_main import main
 
 sg.ChangeLookAndFeel('Black')
 
-form = sg.FlexForm('GUI Testing', default_element_size=(40, 1))
+form = sg.FlexForm('Engineering Drawings OCR', default_element_size=(40, 1))
 
 column1 = [[sg.Text('Orientation Threshold: ', text_color='#000000', background_color='#ffffff', justification='left', size=(20, 1))],
            [sg.Slider(range=(0, 100), orientation='h', size=(20, 15), default_value=50)]]
