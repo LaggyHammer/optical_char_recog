@@ -32,8 +32,8 @@ if values[0] is not None:
     input_path = values[0]
     write_to_file = values[1]
     searchable_pdf = values[2]
-    orientation_threshold = values[3]
-    script_threshold = values[4]
+    orientation_threshold = values[3]/100
+    script_threshold = values[4]/100
 
     main(input_folder=input_path, write_to_file=write_to_file, searchable_pdf=searchable_pdf,
          orientation_threshold=orientation_threshold, script_threshold=script_threshold)

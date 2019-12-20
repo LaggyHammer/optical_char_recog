@@ -6,6 +6,8 @@ from search_functions import *
 import os
 from progress.bar import ChargingBar
 import time
+import PySimpleGUI as sg
+
 
 # Tracking Time
 start_time = time.time()
@@ -25,7 +27,14 @@ def read_file_names(folder_name='Input'):
 # PDF to Image Function
 def pdf_to_image(file_list):
     file_dict = {}
+
     bar = ChargingBar(" Processing Image Conversion", max=len(file_list))
+    layout = [[sg.Text('Converting PDF to Image')],
+              [sg.ProgressBar(len(file_list), orientation='h', size=(20, 2), key='progressbar')],
+              [sg.Cancel()]]
+    window = sg.Window('Progress', layout)
+    progress_bar = window['progressbar']
+    i = 1
 
     for filename in file_list:
         # print("Converting " + filename + " to image..") # debug
@@ -33,7 +42,14 @@ def pdf_to_image(file_list):
         file_dict[filename] = images
 
         bar.next()
+        event, values = window.read(timeout=10)
+        if event == 'Cancel' or event is None:
+            break
+
+        progress_bar.UpdateBar(i)
+        i += 1
     bar.finish()
+    window.close()
 
     print("\n Conversion Successful")
 
@@ -43,7 +59,15 @@ def pdf_to_image(file_list):
 # Orientation Handling
 def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
     oriented_images = {}
+
     bar = ChargingBar(" Processing Orientation", max=len(image_dict))
+    layout = [[sg.Text('Orienting Images')],
+              [sg.ProgressBar(len(image_dict), orientation='h', size=(20, 2), key='progressbar')],
+              [sg.Cancel()]]
+    window = sg.Window('Progress', layout)
+    progress_bar = window['progressbar']
+    i = 1
+
     for filename in image_dict.keys():
         for img in image_dict[filename]:
             # print("Handling Orientation for image " + filename + "...") # debug
@@ -83,8 +107,15 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
             # img.show() # debug
             oriented_images[filename] = img
 
+        event, values = window.read(timeout=10)
+        if event == 'Cancel' or event is None:
+            break
+
+        progress_bar.UpdateBar(i)
+        i += 1
         bar.next()
     bar.finish()
+    window.close()
 
     if oriented_images:
         print("\n Orientation Handling Successful")
@@ -97,6 +128,13 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
     req_info_dict = {}
 
     bar = ChargingBar(" Processing OCR", max=len(image_dict))
+    layout = [[sg.Text('Orienting Images')],
+              [sg.ProgressBar(len(image_dict), orientation='h', size=(20, 2), key='progressbar')],
+              [sg.Cancel()]]
+    window = sg.Window('Progress', layout)
+    progress_bar = window['progressbar']
+    i = 1
+
     for filename in image_dict.keys():
         img = image_dict[filename]
         # print("Recognizing Text in " + filename + "...") # debug
@@ -131,8 +169,16 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
 
         req_info_dict[filename] = req_info
         # print("Done") # debug
+
+        event, values = window.read(timeout=10)
+        if event == 'Cancel' or event is None:
+            break
+
+        progress_bar.UpdateBar(i)
+        i += 1
         bar.next()
     bar.finish()
+    window.close()
 
     # print(req_info_dict) # debug
     print("\n OCR Successful")
@@ -144,6 +190,13 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
 def dict_to_excel(ocr_info_dict):
     with ExcelWriter('Output/ocr_output.xlsx') as writer:
         bar = ChargingBar(" Processing Output", max=len(ocr_info_dict))
+        layout = [[sg.Text('Orienting Images')],
+                  [sg.ProgressBar(len(ocr_info_dict), orientation='h', size=(20, 2), key='progressbar')],
+                  [sg.Cancel()]]
+        window = sg.Window('Progress', layout)
+        progress_bar = window['progressbar']
+        i = 1
+
         for filename, info in ocr_info_dict.items():
             # print("Writing to Excel...") # debug
             # print("Output for " + filename + ": \n") # debug
@@ -170,8 +223,16 @@ def dict_to_excel(ocr_info_dict):
             df = df.T
             # print(df) # debug
             df.to_excel(writer, sheet_name=filename.split('.')[0].split('/')[1])
+
+            event, values = window.read(timeout=10)
+            if event == 'Cancel' or event is None:
+                break
+
+            progress_bar.UpdateBar(i)
+            i += 1
             bar.next()
         bar.finish()
+        window.close()
 
     print("\n Output Successful")
 
