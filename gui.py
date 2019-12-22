@@ -14,7 +14,7 @@ layout = [
     [sg.Text('_' * 80)],
     [sg.Text('Choose Input Folder', size=(35, 1))],
     [sg.Text('Input Folder', size=(15, 1), auto_size_text=False, justification='right'),
-     sg.InputText('Default Folder'), sg.FolderBrowse()],
+     sg.InputText('Input'), sg.FolderBrowse()],
     [sg.Frame(layout=[
         [sg.Checkbox('Create OCR Text File', default=True), sg.Checkbox('Create Searchable PDF', default=False)]
         ],
