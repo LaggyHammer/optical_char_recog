@@ -113,5 +113,3 @@ def find_dynamic_loads(text, key='DYNAMIC'):
             break
 
     return results
-
-

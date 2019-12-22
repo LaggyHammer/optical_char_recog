@@ -202,81 +202,42 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
 def dict_to_excel(ocr_info_dict):
     with ExcelWriter('Output/ocr_output.xlsx') as writer:
 
-        print(ocr_info_dict) # debug
+        # print(ocr_info_dict) # debug
 
-        dict_r = {}
-        for i in list(ocr_info_dict.keys()):
-            list_to = []
-            for j in list(ocr_info_dict[i].values()):
-                list_to = list_to + j
-            dict_r[i] = list_to
+        # Getting all attribute values in a list
+        dict_ocr = {}
+        for filename in list(ocr_info_dict.keys()):
+            values_list = []
+            for value in list(ocr_info_dict[filename].values()):
+                values_list = values_list + value
+            dict_ocr[filename] = values_list
 
+        # Finding out the max length of output columns
         max_len = 7
-        for i in list(dict_r.keys()):
-            if max_len < len(dict_r[i]):
-                max_len = len(dict_r[i])
-                k = i
-                print(k)
-                print(max_len)
+        for filename in list(dict_ocr.keys()):
+            if max_len < len(dict_ocr[filename]):
+                max_len = len(dict_ocr[filename])
+                # print(filename) # debug
+                # print(max_len) # debug
 
-        for j in list(dict_r.keys()):
-            while max_len > len(dict_r[j]):
-                dict_r[j].append(np.nan)
+        # Making every list the same length
+        for filename in list(dict_ocr.keys()):
+            while max_len > len(dict_ocr[filename]):
+                dict_ocr[filename].append(np.nan)
 
+        # Attributes list
         rows = ['Total Mass', 'Static Loads', ' ', 'Spring Constant', 'Operating Speed', 'Dynamic Loads']
-
         while max_len > len(rows):
             rows.append(' ')
 
+        # Output data frame
         df = pd.DataFrame()
-        df['Attributes'] = rows
 
-        for j in list(dict_r.keys()):
-            df[j] = dict_r[j]
+        df['Attributes'] = rows
+        for filename in list(dict_ocr.keys()):
+            df[filename.split('/')[-1]] = dict_ocr[filename]
 
         df.to_excel(writer)
-        # for filename, info in ocr_info_dict.items():
-        #     # print("Writing to Excel...") # debug
-        #     # print("Output for " + filename + ": \n") # debug
-        #
-        #     # window interaction
-        #     event, values = window.read(timeout=10)
-        #     if event == 'Cancel' or event is None:
-        #         break
-        #     if i == 1:
-        #         progress_bar.UpdateBar(0)
-        #
-        #     # Finding the largest column
-        #     columns_length = 1
-        #     for key in list(info.keys()):
-        #         if len(info[key]) > columns_length:
-        #             max_length_column = key
-        #             columns_length = len(info[key])
-        #
-        #     # Initiating DataFrame with the largest column
-        #     df = pd.DataFrame()
-        #     df[max_length_column] = pd.Series(info[max_length_column])
-        #
-        #     # Adding other columns
-        #     for key in list(info.keys()):
-        #         df[key] = pd.Series(info[key])
-        #
-        #     # Rearranging Columns
-        #     df = df[['Total Mass', 'Static Load', 'Spring Constant', 'Operating Speed'
-        #              , 'Dynamic Loads'
-        #              ]]
-        #
-        #     # Transposing DataFrame
-        #     df = df.T
-        #     # print(df) # debug
-        #     # print(filename)  # debug
-        #     df.to_excel(writer, sheet_name=filename.split('.')[0].split('/')[-1])
-        #
-        #     # progress bar increment
-        #     progress_bar.UpdateBar(i)
-        #     i += 1
-        #
-        # window.close()
 
     print("\n Output Successful")
 
