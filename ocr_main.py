@@ -6,6 +6,7 @@ from search_functions import *
 import os
 import time
 import PySimpleGUI as sg
+import numpy as np
 
 # Tracking Time
 start_time = time.time()
@@ -201,55 +202,42 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
 def dict_to_excel(ocr_info_dict):
     with ExcelWriter('Output/ocr_output.xlsx') as writer:
 
-        layout = [[sg.Text('Writing to Excel')],
-                  [sg.ProgressBar(len(ocr_info_dict), orientation='h', size=(20, 2), key='progressbar')],
-                  [sg.Cancel()]]
-        window = sg.Window('Progress', layout)
-        progress_bar = window['progressbar']
-        i = 1
+        # print(ocr_info_dict) # debug
 
-        for filename, info in ocr_info_dict.items():
-            # print("Writing to Excel...") # debug
-            # print("Output for " + filename + ": \n") # debug
+        # Getting all attribute values in a list
+        dict_ocr = {}
+        for filename in list(ocr_info_dict.keys()):
+            values_list = []
+            for value in list(ocr_info_dict[filename].values()):
+                values_list = values_list + value
+            dict_ocr[filename] = values_list
 
-            # window interaction
-            event, values = window.read(timeout=10)
-            if event == 'Cancel' or event is None:
-                break
-            if i == 1:
-                progress_bar.UpdateBar(0)
+        # Finding out the max length of output columns
+        max_len = 7
+        for filename in list(dict_ocr.keys()):
+            if max_len < len(dict_ocr[filename]):
+                max_len = len(dict_ocr[filename])
+                # print(filename) # debug
+                # print(max_len) # debug
 
-            # Finding the largest column
-            columns_length = 1
-            for key in list(info.keys()):
-                if len(info[key]) > columns_length:
-                    max_length_column = key
-                    columns_length = len(info[key])
+        # Making every list the same length
+        for filename in list(dict_ocr.keys()):
+            while max_len > len(dict_ocr[filename]):
+                dict_ocr[filename].append(np.nan)
 
-            # Initiating DataFrame with the largest column
-            df = pd.DataFrame()
-            df[max_length_column] = pd.Series(info[max_length_column])
+        # Attributes list
+        rows = ['Total Mass', 'Static Loads', ' ', 'Spring Constant', 'Operating Speed', 'Dynamic Loads']
+        while max_len > len(rows):
+            rows.append(' ')
 
-            # Adding other columns
-            for key in list(info.keys()):
-                df[key] = pd.Series(info[key])
+        # Output data frame
+        df = pd.DataFrame()
 
-            # Rearranging Columns
-            df = df[['Total Mass', 'Static Load', 'Spring Constant', 'Operating Speed'
-                     , 'Dynamic Loads'
-                     ]]
+        df['Attributes'] = rows
+        for filename in list(dict_ocr.keys()):
+            df[filename.split('/')[-1]] = dict_ocr[filename]
 
-            # Transposing DataFrame
-            df = df.T
-            # print(df) # debug
-            # print(filename)  # debug
-            df.to_excel(writer, sheet_name=filename.split('.')[0].split('/')[-1])
-
-            # progress bar increment
-            progress_bar.UpdateBar(i)
-            i += 1
-
-        window.close()
+        df.to_excel(writer)
 
     print("\n Output Successful")
 
