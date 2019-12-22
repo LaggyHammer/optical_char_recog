@@ -80,20 +80,21 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
 
         for img in image_dict[filename]:
             # print("Handling Orientation for image " + filename + "...") # debug
-
-
+            # img.show()  # debug
 
             # Aspect Ratio Check
             (width, height) = img.size
             if height > width:
                 img = img.rotate(90, expand=True)
                 info = tesseract.image_to_osd(img)  # Orientation Info
-                # print(info) # debug
+
 
             else:
                 info = tesseract.image_to_osd(img)  # Orientation Info
 
+            # print(info)  # debug
             info = info.split('\n')
+            # img.show()  # debug
 
             # Rotation Angle (0 or 180)
             rotation_angle = info[1]
@@ -115,7 +116,7 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
                 if script_confidence > script_threshold and orientation_confidence > orientation_threshold:
                     img = img.rotate(rotation_angle, expand=True)
 
-            # img.show() # debug
+            # img.show()  # debug
             oriented_images[filename] = img
 
         # progress bar increment
@@ -234,11 +235,14 @@ def dict_to_excel(ocr_info_dict):
                 df[key] = pd.Series(info[key])
 
             # Rearranging Columns
-            df = df[['Total Mass', 'Static Load', 'Spring Constant', 'Operating Speed', 'Dynamic Loads']]
+            df = df[['Total Mass', 'Static Load', 'Spring Constant', 'Operating Speed'
+                     , 'Dynamic Loads'
+                     ]]
 
             # Transposing DataFrame
             df = df.T
             # print(df) # debug
+            # print(filename)  # debug
             df.to_excel(writer, sheet_name=filename.split('.')[0].split('/')[-1])
 
             # progress bar increment

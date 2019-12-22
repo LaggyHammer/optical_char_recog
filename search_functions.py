@@ -13,7 +13,7 @@ def find_static_load(text, key='STATIC LOAD PER SUPPORT POINT'):
         search_string = text[search_start:]
         equal_sign_pos = search_string.find('=')
         search_string = search_string[equal_sign_pos - 5: equal_sign_pos + 100]
-        for m in itertools.islice(re.finditer("p.{0,2}s{0,1}\s{0,1}=\s{0,1}\d{1,5}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o)",
+        for m in itertools.islice(re.finditer("p.{0,2}s{0,1}\s{0,1}=\s{0,1}\d{1,5}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o|9)",
                                               search_string), 2):
             # Regex: 'p + 0-2 characters + s (maybe) + space (maybe) + = + 1-5 digits + . or , (maybe) + 0-3 digits or
             # 'o's + space (maybe) + k + g or o
@@ -35,9 +35,7 @@ def find_spring_constant(text, key='SPRING CONSTANT OF'):
     for match in match_list:
         search_start = match[0]
         search_string = text[search_start:]
-        equal_sign_pos = search_string.find('=')
-        search_string = search_string[equal_sign_pos - 5: equal_sign_pos + 100]
-        for m in itertools.islice(re.finditer("\d{0,3}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o)/mm", search_string), 1):
+        for m in itertools.islice(re.finditer("\d{0,3}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o|9)\/mm", search_string), 1):
             # Regex: 0-3 digits + . or , (maybe) + 0-3 digits or 'o's + space (maybe) + k + g or o + /mm
             result = m.string[m.start():m.end()]
             # print(result)
@@ -58,7 +56,7 @@ def find_operating_speed(text, key='OPERATING SPEED'):
         search_start = match[0]
         search_string = text[search_start:]
         for m in itertools.islice(
-                re.finditer("\d{1,5}\s{0,1}(r.{0,1}\s{0,1}p.{0,1}\s{0,1}m.{0,1}|r\s{0,1}\/\s{0,1}min)", search_string),
+                re.finditer("\d{1,5}\s{0,1}(r.{0,1}\s{0,1}p.{0,1}\s{0,1}m.{0,1}|r\s{0,1}\/\s{0,1}min){0,1}", search_string),
                 1):
             # Regex: 1-5 digits + space (maybe) + (rpm or r.p.m. or r/min)
             result = m.string[m.start():m.end()]
@@ -81,7 +79,7 @@ def find_total_mass(text, key='TOTAL MASS OF'):
         search_string = text[search_start:]
         equal_sign_pos = search_string.find('=')
         search_string = search_string[equal_sign_pos - 5: equal_sign_pos + 100]
-        for m in itertools.islice(re.finditer("\d{1,5}\s{0,1}k(g|o)", search_string), 1):
+        for m in itertools.islice(re.finditer("\d{1,5}\s{0,1}k(g|o|9)", search_string), 1):
             # Regex: 1-5 digits + space (maybe) + k + g or o
             result = m.string[m.start():m.end()]
             # print(result)
@@ -105,7 +103,7 @@ def find_dynamic_loads(text, key='DYNAMIC'):
         search_string = text[search_start:]
         next_field_pos = search_string.find('spring')
         search_string = search_string[: next_field_pos]
-        for m in itertools.islice(re.finditer("\d{0,5}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o)", search_string), 10):
+        for m in itertools.islice(re.finditer("\d{0,5}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o|9)", search_string), 10):
             # Regex: 0-5 digits + . or , (maybe) + 0-3 digits or 'o's + space (maybe) + k + g or o
             result = m.string[m.start():m.end()]
             # print(result)
