@@ -8,9 +8,6 @@ import time
 import PySimpleGUI as sg
 import numpy as np
 
-# Tracking Time
-start_time = time.time()
-
 # Tesseract OCR File Path
 tesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
@@ -245,6 +242,10 @@ def dict_to_excel(ocr_info_dict):
 # Main Execution Function (Call this!)
 def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orientation_threshold=0.5,
          script_threshold=0.5):
+    
+    # Tracking Time
+    start_time = time.time()
+    
     print("\n (Step 1 of 5) Reading Files...")
     file_list = read_file_names(input_folder)
     read_time = time.time()
@@ -274,5 +275,6 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
 
 
 if __name__ == "__main__":
+    start_time = time.time()
     main(write_to_file=False, searchable_pdf=False)
     print("\n Total time to run: ""%s seconds" % (time.time() - start_time))
