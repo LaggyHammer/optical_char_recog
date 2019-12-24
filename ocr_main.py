@@ -275,5 +275,6 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
 
 
 if __name__ == "__main__":
+    start_time = time.time()
     main(write_to_file=False, searchable_pdf=False)
     print("\n Total time to run: ""%s seconds" % (time.time() - start_time))
