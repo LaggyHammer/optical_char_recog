@@ -8,8 +8,10 @@ import time
 import PySimpleGUI as sg
 import numpy as np
 
+
 # Tesseract OCR File Path
-tesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+def tess_path(path):
+    tesseract.pytesseract.tesseract_cmd = path
 
 
 # Read File Names from Folder
@@ -85,7 +87,6 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
             if height > width:
                 img = img.rotate(90, expand=True)
                 info = tesseract.image_to_osd(img)  # Orientation Info
-
 
             else:
                 info = tesseract.image_to_osd(img)  # Orientation Info
@@ -241,11 +242,11 @@ def dict_to_excel(ocr_info_dict):
 
 # Main Execution Function (Call this!)
 def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orientation_threshold=0.5,
-         script_threshold=0.5):
-    
+         script_threshold=0.5, ocr_engine=r"C:\Program Files\Tesseract-OCR\tesseract.exe"):
+    tess_path(ocr_engine)
     # Tracking Time
     start_time = time.time()
-    
+
     print("\n (Step 1 of 5) Reading Files...")
     file_list = read_file_names(input_folder)
     read_time = time.time()

@@ -16,7 +16,7 @@ def ocr_gui():
     layout = [
         [sg.Text('Automated OCR for GAs', size=(30, 1), font=("Helvetica", 25))],
         [sg.Text('_' * 80)],
-        [sg.Text('Choose Input Folder', size=(35, 1))],
+        [sg.Text('Choose Input Folder :', size=(35, 1))],
         [sg.Text('Input Folder', size=(15, 1), auto_size_text=False, justification='right'),
          sg.InputText('Input'), sg.FolderBrowse()],
         [sg.Frame(layout=[
@@ -24,7 +24,10 @@ def ocr_gui():
         ],
             title='Additional Files', title_color='white', relief=sg.RELIEF_SUNKEN)],
         [sg.Frame(layout=[
-            [sg.Column(column1, background_color='#ffffff'), sg.Column(column2, background_color='#ffffff')]
+            [sg.Column(column1, background_color='#ffffff'), sg.Column(column2, background_color='#ffffff')],
+            [sg.Text('Choose OCR Engine :', size=(35, 1))],
+            [sg.Text('OCR Engine', size=(15, 1), auto_size_text=False, justification='right'),
+             sg.InputText(r"C:\Program Files\Tesseract-OCR\tesseract.exe"), sg.FolderBrowse()]
         ],
             title='Advanced Settings', title_color='white', relief=sg.RELIEF_RIDGE)],
         [sg.Text('_' * 80)],
@@ -43,11 +46,13 @@ def launch_ocr(input_values):
         searchable_pdf = input_values[2]
         orientation_threshold = input_values[3] / 100
         script_threshold = input_values[4] / 100
+        ocr_engine = input_values[5]
 
         main(input_folder=input_path, write_to_file=write_to_file, searchable_pdf=searchable_pdf,
-             orientation_threshold=orientation_threshold, script_threshold=script_threshold)
+             orientation_threshold=orientation_threshold, script_threshold=script_threshold, ocr_engine=ocr_engine)
 
 
 if __name__ == "__main__":
     form_input_values = ocr_gui()
+    print(form_input_values)
     launch_ocr(form_input_values)
