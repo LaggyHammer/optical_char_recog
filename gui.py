@@ -2,7 +2,7 @@ import PySimpleGUI as sg
 from ocr_main import main
 
 # application version: release.improvement.bug_fix
-app_version = '0.5.10 (Beta)'
+app_version = '0.6.10 (Beta)'
 
 
 def ocr_gui():
@@ -22,13 +22,14 @@ def ocr_gui():
         [sg.Text('Choose Input Folder :', size=(35, 1))],
         [sg.Text('Input Folder', size=(15, 1), auto_size_text=False, justification='right'),
          sg.InputText('Input'), sg.FolderBrowse()],
-        [sg.Text('Choose Search Keywords :', size=(35, 1))],
-        [sg.Checkbox('Total Mass', default=True),
-         sg.Checkbox('Static Loads', default=True),
-         sg.Checkbox('Spring Constant', default=True),
-         sg.Checkbox('Operating Speed', default=True),
-         sg.Checkbox('Dynamic Loads', default=True)
-         ],
+        [sg.Frame(layout=[
+            [sg.Checkbox('Total Mass', default=True),
+             sg.Checkbox('Static Loads', default=True),
+             sg.Checkbox('Spring Constant', default=True),
+             sg.Checkbox('Operating Speed', default=True),
+             sg.Checkbox('Dynamic Loads', default=True)]
+        ],
+            title='Search Keywords', title_color='white', relief=sg.RELIEF_SUNKEN)],
         [sg.Frame(layout=[
             [sg.Checkbox('Create OCR Text File', default=True), sg.Checkbox('Create Searchable PDF', default=False)]
         ],
