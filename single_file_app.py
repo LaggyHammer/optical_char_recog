@@ -396,6 +396,9 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
 
 # GUI
 
+# application version: release.improvement.bug_fix
+app_version = '0.5.10 (Beta)'
+
 def ocr_gui():
     sg.ChangeLookAndFeel('Dark Blue 3')
 
@@ -425,7 +428,9 @@ def ocr_gui():
         ],
             title='Advanced Settings', title_color='white', relief=sg.RELIEF_RIDGE)],
         [sg.Text('_' * 80)],
-        [sg.Submit()]
+        [sg.Submit()],
+        [sg.Text('App Version ' + app_version, font=("Helvetica", 10)),
+         sg.Text('Created & Maintained by Ankit Saxena')]
     ]
 
     button, values = form.layout(layout).Read()
