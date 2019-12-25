@@ -6,7 +6,6 @@ from search_functions import *
 import os
 import time
 import PySimpleGUI as sg
-import numpy as np
 
 
 # Tesseract OCR File Path
@@ -131,7 +130,7 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
 
 
 # Image to Text (Main OCR)
-def image_ocr(image_dict, write_to_file, searchable_pdf):
+def image_ocr(image_dict, write_to_file, searchable_pdf, search_list):
     req_info_dict = {}
 
     layout = [[sg.Text('Recognizing Text')],
@@ -175,11 +174,20 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
         req_info = {}
         # print("Looking for keywords...") # debug
         text = text.lower()
-        req_info['Total Mass'] = find_total_mass(text)
-        req_info['Static Load'] = find_static_load(text)
-        req_info['Spring Constant'] = find_spring_constant(text)
-        req_info['Operating Speed'] = find_operating_speed(text)
-        req_info['Dynamic Loads'] = find_dynamic_loads(text)
+        if search_list[0]:
+            req_info['Total Mass'] = find_total_mass(text)
+
+        if search_list[1]:
+            req_info['Static Load'] = find_static_load(text)
+
+        if search_list[2]:
+            req_info['Spring Constant'] = find_spring_constant(text)
+
+        if search_list[3]:
+            req_info['Operating Speed'] = find_operating_speed(text)
+
+        if search_list[4]:
+            req_info['Dynamic Loads'] = find_dynamic_loads(text)
 
         req_info_dict[filename] = req_info
         # print("Done") # debug
@@ -221,17 +229,21 @@ def dict_to_excel(ocr_info_dict):
         # Making every list the same length
         for filename in list(dict_ocr.keys()):
             while max_len > len(dict_ocr[filename]):
-                dict_ocr[filename].append(np.nan)
+                dict_ocr[filename].append(' ')
 
         # Attributes list
-        rows = ['Total Mass', 'Static Loads', ' ', 'Spring Constant', 'Operating Speed', 'Dynamic Loads']
-        while max_len > len(rows):
-            rows.append(' ')
+        attribute_list = list(list(ocr_info_dict.values())[0].keys())
+        if 'Static Load' in attribute_list:
+            attribute_list.insert(attribute_list.index('Static Load') + 1, ' ')
+
+        # rows = ['Total Mass', 'Static Loads', ' ', 'Spring Constant', 'Operating Speed', 'Dynamic Loads']
+        while max_len > len(attribute_list):
+            attribute_list.append(' ')
 
         # Output data frame
         df = pd.DataFrame()
 
-        df['Attributes'] = rows
+        df['Attributes'] = attribute_list
         for filename in list(dict_ocr.keys()):
             df[filename.split('/')[-1]] = dict_ocr[filename]
 
@@ -242,7 +254,7 @@ def dict_to_excel(ocr_info_dict):
 
 # Main Execution Function (Call this!)
 def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orientation_threshold=0.5,
-         script_threshold=0.5, ocr_engine=r"C:\Program Files\Tesseract-OCR\tesseract.exe"):
+         script_threshold=0.5, ocr_engine=r"C:\Program Files\Tesseract-OCR\tesseract.exe", search_list=[True] * 5):
     tess_path(ocr_engine)
     # Tracking Time
     start_time = time.time()
@@ -263,7 +275,7 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
     print("Oriented " + str(len(oriented_images_dict)) + " images in ""%s seconds" % (orient_time - convert_time))
 
     print("\n (Step 4 of 5) Commencing OCR...")
-    info_list = image_ocr(oriented_images_dict, write_to_file, searchable_pdf)
+    info_list = image_ocr(oriented_images_dict, write_to_file, searchable_pdf, search_list)
     ocr_time = time.time()
     print("Passed " + str(len(info_list)) + " files through OCR in ""%s seconds" % (ocr_time - orient_time))
 

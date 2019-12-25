@@ -250,7 +250,7 @@ def orient_image(image_dict, orientation_threshold=0.5, script_threshold=0.5):
 
 
 # Image to Text (Main OCR)
-def image_ocr(image_dict, write_to_file, searchable_pdf):
+def image_ocr(image_dict, write_to_file, searchable_pdf, search_list):
     req_info_dict = {}
 
     layout = [[sg.Text('Recognizing Text')],
@@ -294,11 +294,20 @@ def image_ocr(image_dict, write_to_file, searchable_pdf):
         req_info = {}
         # print("Looking for keywords...") # debug
         text = text.lower()
-        req_info['Total Mass'] = find_total_mass(text)
-        req_info['Static Load'] = find_static_load(text)
-        req_info['Spring Constant'] = find_spring_constant(text)
-        req_info['Operating Speed'] = find_operating_speed(text)
-        req_info['Dynamic Loads'] = find_dynamic_loads(text)
+        if search_list[0]:
+            req_info['Total Mass'] = find_total_mass(text)
+
+        if search_list[1]:
+            req_info['Static Load'] = find_static_load(text)
+
+        if search_list[2]:
+            req_info['Spring Constant'] = find_spring_constant(text)
+
+        if search_list[3]:
+            req_info['Operating Speed'] = find_operating_speed(text)
+
+        if search_list[4]:
+            req_info['Dynamic Loads'] = find_dynamic_loads(text)
 
         req_info_dict[filename] = req_info
         # print("Done") # debug
@@ -343,14 +352,18 @@ def dict_to_excel(ocr_info_dict):
                 dict_ocr[filename].append(' ')
 
         # Attributes list
-        rows = ['Total Mass', 'Static Loads', ' ', 'Spring Constant', 'Operating Speed', 'Dynamic Loads']
-        while max_len > len(rows):
-            rows.append(' ')
+        attribute_list = list(list(ocr_info_dict.values())[0].keys())
+        if 'Static Load' in attribute_list:
+            attribute_list.insert(attribute_list.index('Static Load') + 1, ' ')
+
+        # rows = ['Total Mass', 'Static Loads', ' ', 'Spring Constant', 'Operating Speed', 'Dynamic Loads']
+        while max_len > len(attribute_list):
+            attribute_list.append(' ')
 
         # Output data frame
         df = pd.DataFrame()
 
-        df['Attributes'] = rows
+        df['Attributes'] = attribute_list
         for filename in list(dict_ocr.keys()):
             df[filename.split('/')[-1]] = dict_ocr[filename]
 
@@ -361,7 +374,7 @@ def dict_to_excel(ocr_info_dict):
 
 # Main Execution Function (Call this!)
 def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orientation_threshold=0.5,
-         script_threshold=0.5, ocr_engine=r"C:\Program Files\Tesseract-OCR\tesseract.exe"):
+         script_threshold=0.5, ocr_engine=r"C:\Program Files\Tesseract-OCR\tesseract.exe", search_list=[True] * 5):
     tess_path(ocr_engine)
     # Tracking Time
     start_time = time.time()
@@ -382,7 +395,7 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
     print("Oriented " + str(len(oriented_images_dict)) + " images in ""%s seconds" % (orient_time - convert_time))
 
     print("\n (Step 4 of 5) Commencing OCR...")
-    info_list = image_ocr(oriented_images_dict, write_to_file, searchable_pdf)
+    info_list = image_ocr(oriented_images_dict, write_to_file, searchable_pdf, search_list)
     ocr_time = time.time()
     print("Passed " + str(len(info_list)) + " files through OCR in ""%s seconds" % (ocr_time - orient_time))
 
@@ -397,7 +410,8 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
 # GUI
 
 # application version: release.improvement.bug_fix
-app_version = '0.5.10 (Beta)'
+app_version = '0.6.10 (Beta)'
+
 
 def ocr_gui():
     sg.ChangeLookAndFeel('Dark Blue 3')
@@ -416,6 +430,13 @@ def ocr_gui():
         [sg.Text('Choose Input Folder :', size=(35, 1))],
         [sg.Text('Input Folder', size=(15, 1), auto_size_text=False, justification='right'),
          sg.InputText('Input'), sg.FolderBrowse()],
+        [sg.Text('Choose Search Keywords :', size=(35, 1))],
+        [sg.Checkbox('Total Mass', default=True),
+         sg.Checkbox('Static Loads', default=True),
+         sg.Checkbox('Spring Constant', default=True),
+         sg.Checkbox('Operating Speed', default=True),
+         sg.Checkbox('Dynamic Loads', default=True)
+         ],
         [sg.Frame(layout=[
             [sg.Checkbox('Create OCR Text File', default=True), sg.Checkbox('Create Searchable PDF', default=False)]
         ],
@@ -431,6 +452,7 @@ def ocr_gui():
         [sg.Submit()],
         [sg.Text('App Version ' + app_version, font=("Helvetica", 10)),
          sg.Text('Created & Maintained by Ankit Saxena')]
+
     ]
 
     button, values = form.layout(layout).Read()
@@ -441,14 +463,16 @@ def ocr_gui():
 def launch_ocr(input_values):
     if input_values[0] is not None:
         input_path = input_values[0]
-        write_to_file = input_values[1]
-        searchable_pdf = input_values[2]
-        orientation_threshold = input_values[3] / 100
-        script_threshold = input_values[4] / 100
-        ocr_engine = input_values[5]
+        search_list = [input_values[1], input_values[2], input_values[3], input_values[4], input_values[5]]
+        write_to_file = input_values[6]
+        searchable_pdf = input_values[7]
+        orientation_threshold = input_values[8] / 100
+        script_threshold = input_values[9] / 100
+        ocr_engine = input_values[10]
 
         main(input_folder=input_path, write_to_file=write_to_file, searchable_pdf=searchable_pdf,
-             orientation_threshold=orientation_threshold, script_threshold=script_threshold, ocr_engine=ocr_engine)
+             orientation_threshold=orientation_threshold, script_threshold=script_threshold, ocr_engine=ocr_engine,
+             search_list=search_list)
 
 
 if __name__ == "__main__":

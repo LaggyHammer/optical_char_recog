@@ -22,6 +22,13 @@ def ocr_gui():
         [sg.Text('Choose Input Folder :', size=(35, 1))],
         [sg.Text('Input Folder', size=(15, 1), auto_size_text=False, justification='right'),
          sg.InputText('Input'), sg.FolderBrowse()],
+        [sg.Text('Choose Search Keywords :', size=(35, 1))],
+        [sg.Checkbox('Total Mass', default=True),
+         sg.Checkbox('Static Loads', default=True),
+         sg.Checkbox('Spring Constant', default=True),
+         sg.Checkbox('Operating Speed', default=True),
+         sg.Checkbox('Dynamic Loads', default=True)
+         ],
         [sg.Frame(layout=[
             [sg.Checkbox('Create OCR Text File', default=True), sg.Checkbox('Create Searchable PDF', default=False)]
         ],
@@ -48,14 +55,16 @@ def ocr_gui():
 def launch_ocr(input_values):
     if input_values[0] is not None:
         input_path = input_values[0]
-        write_to_file = input_values[1]
-        searchable_pdf = input_values[2]
-        orientation_threshold = input_values[3] / 100
-        script_threshold = input_values[4] / 100
-        ocr_engine = input_values[5]
+        search_list = [input_values[1], input_values[2], input_values[3], input_values[4], input_values[5]]
+        write_to_file = input_values[6]
+        searchable_pdf = input_values[7]
+        orientation_threshold = input_values[8] / 100
+        script_threshold = input_values[9] / 100
+        ocr_engine = input_values[10]
 
         main(input_folder=input_path, write_to_file=write_to_file, searchable_pdf=searchable_pdf,
-             orientation_threshold=orientation_threshold, script_threshold=script_threshold, ocr_engine=ocr_engine)
+             orientation_threshold=orientation_threshold, script_threshold=script_threshold, ocr_engine=ocr_engine,
+             search_list=search_list)
 
 
 if __name__ == "__main__":
