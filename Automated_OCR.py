@@ -410,7 +410,7 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
 # GUI
 
 # application version: release.improvement.bug_fix
-app_version = '0.6.10 (Beta)'
+app_version = '0.6.11 (Beta)'
 
 
 def ocr_gui():
@@ -446,7 +446,7 @@ def ocr_gui():
             [sg.Column(column1, background_color='#ffffff'), sg.Column(column2, background_color='#ffffff')],
             [sg.Text('Choose OCR Engine :', size=(35, 1))],
             [sg.Text('OCR Engine', size=(15, 1), auto_size_text=False, justification='right'),
-             sg.InputText(r"C:\Program Files\Tesseract-OCR\tesseract.exe"), sg.FolderBrowse()]
+             sg.InputText(r"C:\Program Files\Tesseract-OCR\tesseract.exe"), sg.FileBrowse()]
         ],
             title='Advanced Settings', title_color='white', relief=sg.RELIEF_RIDGE)],
         [sg.Text('_' * 80)],
