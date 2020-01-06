@@ -106,7 +106,7 @@ def find_total_mass(text, key='TOTAL MASS OF'):
 def find_dynamic_loads(text, key='DYNAMIC'):
     results = []
     key = key.lower()
-    match_list = find_near_matches('total mass of', text, max_l_dist=2)
+    match_list = find_near_matches(key, text, max_l_dist=2)
     text = text[match_list[0][0]:]
     match_list = find_near_matches(key, text, max_l_dist=2)
     for match in match_list:
@@ -410,7 +410,7 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
 # GUI
 
 # application version: release.improvement.bug_fix
-app_version = '0.6.11 (Beta)'
+app_version = '0.6.12 (Beta)'
 
 
 def ocr_gui():
