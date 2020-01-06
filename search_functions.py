@@ -24,6 +24,8 @@ def find_static_load(text, key='STATIC LOAD PER SUPPORT POINT'):
         if bool(results):
             break
 
+        results = [' ']
+
     return results
 
 
@@ -43,6 +45,8 @@ def find_spring_constant(text, key='SPRING CONSTANT OF'):
 
         if bool(results):
             break
+
+        results = [' ']
 
     return results
 
@@ -66,6 +70,8 @@ def find_operating_speed(text, key='OPERATING SPEED'):
         if bool(results):
             break
 
+        results = [' ']
+
     return results
 
 
@@ -87,6 +93,8 @@ def find_total_mass(text, key='TOTAL MASS OF'):
 
         if bool(results):
             break
+
+        results = [' ']
 
     return results
 
@@ -111,5 +119,7 @@ def find_dynamic_loads(text, key='DYNAMIC'):
 
         if bool(results):
             break
+
+        results = [' ']
 
     return results
