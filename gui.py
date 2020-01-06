@@ -2,7 +2,7 @@ import PySimpleGUI as sg
 from ocr_main import main
 
 # application version: release.improvement.bug_fix
-app_version = '0.6.11 (Beta)'
+app_version = '0.6.12 (Beta)'
 
 
 def ocr_gui():
