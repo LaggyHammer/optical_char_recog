@@ -124,3 +124,18 @@ def find_dynamic_loads(text, key='DYNAMIC'):
 
     results = [' ']
     return results
+
+
+def formatting(result_list):
+    results = []
+    for value in result_list:
+        if value != ' ':
+            for m in itertools.islice(re.finditer("\d{1,7}[^a-np-z\s](\.|,){0,1}(\d|o){0,3}", value), 1):
+                # Regex: 1-5 digits with decimal
+                result = m.string[m.start():m.end()]
+                # print(result)
+                results.append(result)
+        else:
+            results.append(value)
+
+    return results

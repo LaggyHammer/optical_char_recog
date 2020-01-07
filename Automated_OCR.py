@@ -136,6 +136,22 @@ def find_dynamic_loads(text, key='DYNAMIC'):
     return results
 
 
+# Remove formatting
+def formatting(result_list):
+    results = []
+    for value in result_list:
+        if value != ' ':
+            for m in itertools.islice(re.finditer("\d{1,7}[^a-np-z\s](\.|,){0,1}(\d|o){0,3}", value), 1):
+                # Regex: 1-5 digits with decimal
+                result = m.string[m.start():m.end()]
+                # print(result)
+                results.append(result)
+        else:
+            results.append(value)
+
+    return results
+
+
 # OCR Main
 
 # Tesseract OCR File Path
@@ -305,19 +321,24 @@ def image_ocr(image_dict, write_to_file, searchable_pdf, search_list):
         # print("Looking for keywords...") # debug
         text = text.lower()
         if search_list[0]:
-            req_info['Total Mass'] = find_total_mass(text)
+            req_info['Total Mass (kg)'] = find_total_mass(text)
+            req_info['Total Mass (kg)'] = formatting(req_info['Total Mass (kg)'])
 
         if search_list[1]:
-            req_info['Static Load'] = find_static_load(text)
+            req_info['Static Load (kg)'] = find_static_load(text)
+            req_info['Static Load (kg)'] = formatting(req_info['Static Load (kg)'])
 
         if search_list[2]:
-            req_info['Spring Constant'] = find_spring_constant(text)
+            req_info['Spring Constant (kg/mm)'] = find_spring_constant(text)
+            req_info['Spring Constant (kg/mm)'] = formatting(req_info['Spring Constant (kg/mm)'])
 
         if search_list[3]:
-            req_info['Operating Speed'] = find_operating_speed(text)
+            req_info['Operating Speed (rpm)'] = find_operating_speed(text)
+            req_info['Operating Speed (rpm)'] = formatting(req_info['Operating Speed (rpm)'])
 
         if search_list[4]:
-            req_info['Dynamic Loads'] = find_dynamic_loads(text)
+            req_info['Dynamic Loads (kg)'] = find_dynamic_loads(text)
+            req_info['Dynamic Loads (kg)'] = formatting(req_info['Dynamic Loads (kg)'])
 
         req_info_dict[filename] = req_info
         # print("Done") # debug
@@ -363,8 +384,8 @@ def dict_to_excel(ocr_info_dict):
 
         # Attributes list
         attribute_list = list(list(ocr_info_dict.values())[0].keys())
-        if 'Static Load' in attribute_list:
-            attribute_list.insert(attribute_list.index('Static Load') + 1, ' ')
+        if 'Static Load (kg)' in attribute_list:
+            attribute_list.insert(attribute_list.index('Static Load (kg)') + 1, ' ')
 
         # rows = ['Total Mass', 'Static Loads', ' ', 'Spring Constant', 'Operating Speed', 'Dynamic Loads']
         while max_len > len(attribute_list):
@@ -420,7 +441,7 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
 # GUI
 
 # application version: release.improvement.bug_fix
-app_version = '0.6.13 (Beta)'
+app_version = '0.7.14 (Beta)'
 
 
 def ocr_gui():
