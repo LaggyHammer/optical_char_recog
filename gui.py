@@ -1,12 +1,13 @@
 import PySimpleGUI as sg
 from ocr_main import main
+import configparser
 
 # application version: release.improvement.bug_fix
-app_version = '0.7.14 (Beta)'
+app_version = '0.8.14 (Beta)'
 
 
 def ocr_gui():
-    sg.ChangeLookAndFeel('Dark Blue 3')
+    sg.ChangeLookAndFeel('Reddit')
 
     form = sg.FlexForm('Engineering Drawings OCR', default_element_size=(40, 1))
 
@@ -29,18 +30,18 @@ def ocr_gui():
              sg.Checkbox('Operating Speed', default=True),
              sg.Checkbox('Dynamic Loads', default=True)]
         ],
-            title='Search Keywords', title_color='white', relief=sg.RELIEF_SUNKEN)],
+            title='Search Keywords', title_color='black', relief=sg.RELIEF_SUNKEN)],
         [sg.Frame(layout=[
             [sg.Checkbox('Create OCR Text File', default=True), sg.Checkbox('Create Searchable PDF', default=False)]
         ],
-            title='Additional Files', title_color='white', relief=sg.RELIEF_SUNKEN)],
+            title='Additional Files', title_color='black', relief=sg.RELIEF_SUNKEN)],
         [sg.Frame(layout=[
             [sg.Column(column1, background_color='#ffffff'), sg.Column(column2, background_color='#ffffff')],
             [sg.Text('Choose OCR Engine :', size=(35, 1))],
-            [sg.Text('OCR Engine', size=(15, 1), auto_size_text=False, justification='right'),
-             sg.InputText(r"C:\Program Files\Tesseract-OCR\tesseract.exe"), sg.FileBrowse()]
+            [sg.Text('Config File', size=(15, 1), auto_size_text=False, justification='right'),
+             sg.InputText('config.ini'), sg.FileBrowse()]
         ],
-            title='Advanced Settings', title_color='white', relief=sg.RELIEF_RIDGE)],
+            title='Advanced Settings', title_color='black', relief=sg.RELIEF_RIDGE)],
         [sg.Text('_' * 80)],
         [sg.Submit()],
         [sg.Text('App Version ' + app_version, font=("Helvetica", 10)),
@@ -53,6 +54,15 @@ def ocr_gui():
     return values
 
 
+# config file reader
+def config_reader(config_path):
+    config = configparser.ConfigParser()
+    config.read(config_path)
+    ocr_path = config['settings']['ocr path']
+
+    return ocr_path
+
+
 def launch_ocr(input_values):
     if input_values[0] is not None:
         input_path = input_values[0]
@@ -61,7 +71,10 @@ def launch_ocr(input_values):
         searchable_pdf = input_values[7]
         orientation_threshold = input_values[8] / 100
         script_threshold = input_values[9] / 100
-        ocr_engine = input_values[10]
+
+        # reading config file
+        ocr_engine = config_reader(input_values[10])
+        print(ocr_engine)
 
         main(input_folder=input_path, write_to_file=write_to_file, searchable_pdf=searchable_pdf,
              orientation_threshold=orientation_threshold, script_threshold=script_threshold, ocr_engine=ocr_engine,
