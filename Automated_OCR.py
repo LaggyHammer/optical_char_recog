@@ -20,8 +20,6 @@ def find_static_load(text, key='STATIC LOAD PER SUPPORT POINT'):
     for match in match_list:
         search_start = match[0]
         search_string = text[search_start:]
-        equal_sign_pos = search_string.find('=')
-        search_string = search_string[equal_sign_pos - 5: equal_sign_pos + 100]
         for m in itertools.islice(
                 re.finditer("p.{0,2}s{0,1}\s{0,1}=\s{0,1}\d{1,5}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o|9)",
                             search_string), 2):
@@ -34,6 +32,9 @@ def find_static_load(text, key='STATIC LOAD PER SUPPORT POINT'):
         if bool(results):
             break
 
+    if not bool(results):
+        results = [' ', ' ']
+    # print(results) # debug
     return results
 
 
@@ -54,6 +55,8 @@ def find_spring_constant(text, key='SPRING CONSTANT OF'):
         if bool(results):
             break
 
+    if not bool(results):
+        results = [' ']
     return results
 
 
@@ -77,6 +80,8 @@ def find_operating_speed(text, key='OPERATING SPEED'):
         if bool(results):
             break
 
+    if not bool(results):
+        results = [' ']
     return results
 
 
@@ -88,8 +93,6 @@ def find_total_mass(text, key='TOTAL MASS OF'):
     for match in match_list:
         search_start = match[0]
         search_string = text[search_start:]
-        equal_sign_pos = search_string.find('=')
-        search_string = search_string[equal_sign_pos - 5: equal_sign_pos + 100]
         for m in itertools.islice(re.finditer("\d{1,5}\s{0,1}k(g|o|9)", search_string), 1):
             # Regex: 1-5 digits + space (maybe) + k + g or o
             result = m.string[m.start():m.end()]
@@ -99,29 +102,52 @@ def find_total_mass(text, key='TOTAL MASS OF'):
         if bool(results):
             break
 
+    if not bool(results):
+        results = [' ']
     return results
 
 
 # Dynamic Loads Function
 def find_dynamic_loads(text, key='DYNAMIC'):
-    results = []
-    key = key.lower()
-    match_list = find_near_matches(key, text, max_l_dist=2)
-    text = text[match_list[0][0]:]
-    match_list = find_near_matches(key, text, max_l_dist=2)
-    for match in match_list:
-        search_start = match[0]
-        search_string = text[search_start:]
-        next_field_pos = search_string.find('spring')
-        search_string = search_string[: next_field_pos]
-        for m in itertools.islice(re.finditer("\d{0,5}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o|9)", search_string), 10):
-            # Regex: 0-5 digits + . or , (maybe) + 0-3 digits or 'o's + space (maybe) + k + g or o
-            result = m.string[m.start():m.end()]
-            # print(result)
-            results.append(result)
+    # results = []
+    # key = key.lower()
+    # match_list = find_near_matches(key, text, max_l_dist=2)
+    # print(match_list)
+    # text = text[match_list[0][0]:]
+    # match_list = find_near_matches(key, text, max_l_dist=2)
+    # print(match_list)
+    # for match in match_list:
+    #     search_start = match[0]
+    #     search_string = text[search_start:]
+    #     next_field_pos = search_string.find('spring')
+    #     search_string = search_string[: next_field_pos]
+    #     for m in itertools.islice(re.finditer("\d{0,5}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o|9)", search_string), 10):
+    #         # Regex: 0-5 digits + . or , (maybe) + 0-3 digits or 'o's + space (maybe) + k + g or o
+    #         result = m.string[m.start():m.end()]
+    #         # print(result)
+    #         results.append(result)
+    #
+    #     if bool(results):
+    #         break
+    #
+    #     results = [' ']
+    # print(results)
+    results = [' ']
+    return results
 
-        if bool(results):
-            break
+
+# Remove formatting
+def formatting(result_list):
+    results = []
+    for value in result_list:
+        if value != ' ':
+            for m in itertools.islice(re.finditer("\d{1,7}[^a-np-z\s](\.|,){0,1}(\d|o){0,3}", value), 1):
+                # Regex: 1-5 digits with decimal
+                result = m.string[m.start():m.end()]
+                # print(result)
+                results.append(result)
+        else:
+            results.append(value)
 
     return results
 
@@ -295,19 +321,24 @@ def image_ocr(image_dict, write_to_file, searchable_pdf, search_list):
         # print("Looking for keywords...") # debug
         text = text.lower()
         if search_list[0]:
-            req_info['Total Mass'] = find_total_mass(text)
+            req_info['Total Mass (kg)'] = find_total_mass(text)
+            req_info['Total Mass (kg)'] = formatting(req_info['Total Mass (kg)'])
 
         if search_list[1]:
-            req_info['Static Load'] = find_static_load(text)
+            req_info['Static Load (kg)'] = find_static_load(text)
+            req_info['Static Load (kg)'] = formatting(req_info['Static Load (kg)'])
 
         if search_list[2]:
-            req_info['Spring Constant'] = find_spring_constant(text)
+            req_info['Spring Constant (kg/mm)'] = find_spring_constant(text)
+            req_info['Spring Constant (kg/mm)'] = formatting(req_info['Spring Constant (kg/mm)'])
 
         if search_list[3]:
-            req_info['Operating Speed'] = find_operating_speed(text)
+            req_info['Operating Speed (rpm)'] = find_operating_speed(text)
+            req_info['Operating Speed (rpm)'] = formatting(req_info['Operating Speed (rpm)'])
 
         if search_list[4]:
-            req_info['Dynamic Loads'] = find_dynamic_loads(text)
+            req_info['Dynamic Loads (kg)'] = find_dynamic_loads(text)
+            req_info['Dynamic Loads (kg)'] = formatting(req_info['Dynamic Loads (kg)'])
 
         req_info_dict[filename] = req_info
         # print("Done") # debug
@@ -353,8 +384,8 @@ def dict_to_excel(ocr_info_dict):
 
         # Attributes list
         attribute_list = list(list(ocr_info_dict.values())[0].keys())
-        if 'Static Load' in attribute_list:
-            attribute_list.insert(attribute_list.index('Static Load') + 1, ' ')
+        if 'Static Load (kg)' in attribute_list:
+            attribute_list.insert(attribute_list.index('Static Load (kg)') + 1, ' ')
 
         # rows = ['Total Mass', 'Static Loads', ' ', 'Spring Constant', 'Operating Speed', 'Dynamic Loads']
         while max_len > len(attribute_list):
@@ -410,7 +441,7 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
 # GUI
 
 # application version: release.improvement.bug_fix
-app_version = '0.6.12 (Beta)'
+app_version = '0.7.14 (Beta)'
 
 
 def ocr_gui():
