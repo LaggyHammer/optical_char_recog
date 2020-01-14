@@ -19,6 +19,10 @@ def ocr_gui():
         [sg.Text('Choose OCR Engine :', size=(35, 1))],
         [sg.Text('OCR Engine', size=(15, 1), auto_size_text=False, justification='right'),
          sg.InputText(r"C:\Program Files\Tesseract-OCR\tesseract.exe"), sg.FileBrowse()],
+        [sg.Frame(layout=[
+            [sg.Column(column1, background_color='#ffffff'), sg.Column(column2, background_color='#ffffff')],
+        ],
+            title='Advanced Settings', title_color='black', relief=sg.RELIEF_RIDGE)],
         [sg.Text('_' * 80)],
         [sg.Submit()],
         [sg.Text('Created & Maintained by Ankit Saxena')]
@@ -26,7 +30,7 @@ def ocr_gui():
     ]
 
     button, values = form.layout(layout).Read()
-    # print(values) # debug
+    print(values) # debug
     return values
 
 
@@ -37,7 +41,8 @@ def config_writer(input_values):
 
         config['DEFAULT'] = {'ocr path': input_values[0]}
 
-        config['settings'] = {}
+        config['settings'] = {'orientation threshold': input_values[1],
+                              'script threshold': input_values[2]}
 
         with open('config.ini', 'w') as configfile:
             config.write(configfile)

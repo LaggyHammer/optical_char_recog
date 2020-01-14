@@ -3,20 +3,14 @@ from ocr_main import main
 import configparser
 
 # application version: release.improvement.bug_fix
-app_version = '0.8.15 (Beta)'
+app_version = '1.1.0 (Beta)'
 
 
 def ocr_gui():
     sg.ChangeLookAndFeel('Reddit')
 
-    form = sg.FlexForm('Engineering Drawings OCR', default_element_size=(40, 1))
+    form = sg.Window('Engineering Drawings OCR', default_element_size=(40, 1))
 
-    column1 = [[sg.Text('Orientation Threshold: ', text_color='#000000', background_color='#ffffff',
-                        justification='left', size=(20, 1))],
-               [sg.Slider(range=(0, 100), orientation='h', size=(20, 15), default_value=50)]]
-    column2 = [[sg.Text('Script Threshold: ', text_color='#000000', background_color='#ffffff', justification='left',
-                        size=(20, 1))],
-               [sg.Slider(range=(0, 100), orientation='h', size=(20, 15), default_value=50)]]
     layout = [
         [sg.Text('Automated OCR for GAs', size=(30, 1), font=("Helvetica", 25))],
         [sg.Text('_' * 80)],
@@ -36,12 +30,11 @@ def ocr_gui():
         ],
             title='Additional Files', title_color='black', relief=sg.RELIEF_SUNKEN)],
         [sg.Frame(layout=[
-            [sg.Column(column1, background_color='#ffffff'), sg.Column(column2, background_color='#ffffff')],
             [sg.Text('Configuration :', size=(35, 1))],
             [sg.Text('Config File', size=(15, 1), auto_size_text=False, justification='right'),
              sg.InputText('config.ini'), sg.FileBrowse()]
         ],
-            title='Advanced Settings', title_color='black', relief=sg.RELIEF_RIDGE)],
+            title='Advanced Settings', title_color='black', relief=sg.RELIEF_SUNKEN)],
         [sg.Text('_' * 80)],
         [sg.Submit()],
         [sg.Text('App Version ' + app_version, font=("Helvetica", 10)),
@@ -58,9 +51,9 @@ def ocr_gui():
 def config_reader(config_path):
     config = configparser.ConfigParser()
     config.read(config_path)
-    ocr_path = config['settings']['ocr path']
+    settings = config['settings']
 
-    return ocr_path
+    return settings
 
 
 def launch_ocr(input_values):
@@ -69,12 +62,14 @@ def launch_ocr(input_values):
         search_list = [input_values[1], input_values[2], input_values[3], input_values[4], input_values[5]]
         write_to_file = input_values[6]
         searchable_pdf = input_values[7]
-        orientation_threshold = input_values[8] / 100
-        script_threshold = input_values[9] / 100
 
         # reading config file
-        ocr_engine = config_reader(input_values[10])
-        print(ocr_engine)
+        settings = config_reader(input_values[10])
+        print(settings)
+
+        ocr_engine = settings['ocr path']
+        orientation_threshold = float(settings['orientation threshold'])/100
+        script_threshold = float(settings['script threshold'])/100
 
         main(input_folder=input_path, write_to_file=write_to_file, searchable_pdf=searchable_pdf,
              orientation_threshold=orientation_threshold, script_threshold=script_threshold, ocr_engine=ocr_engine,
