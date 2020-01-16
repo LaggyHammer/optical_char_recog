@@ -77,16 +77,6 @@ def config_gui():
     return values, keyword_dict
 
 
-def regular_exp(unit):
-    mapping = {'kg': "\d{1,5}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o|9)",
-               'kg/mm': "\d{0,3}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o|9)\/mm",
-               'rpm or equivalent': "\d{1,5}\s{0,1}(r.{0,1}\s{0,1}p.{0,1}\s{0,1}m.{0,1}|r\s{0,1}\/\s{0,1}min){0,1}"}
-
-    reg_exp = mapping[unit]
-
-    return reg_exp
-
-
 def config_writer(input_values, custom_keywords):
     if input_values[0] is not None:
         config = configparser.ConfigParser()
