@@ -22,7 +22,7 @@ def config_gui():
         ],
             title='Advanced Settings', title_color='black', relief=sg.RELIEF_RIDGE)],
         [sg.Button('Add Custom Keyword(s)', key='Add Keyword')],
-        [sg.Text('Keywords Added:'), sg.Text(size=(60, 1), key='KEY-LIST')],
+        [sg.Text('Keywords Added:'), sg.Text(size=(60, 5), key='KEY-LIST')],
         [sg.Text(size=(15, 1), key='-OUTPUT-')],
         [sg.Text('_' * 80)],
         [sg.Submit()],
@@ -33,6 +33,12 @@ def config_gui():
 
     keyword_dict = {}
 
+    keyword_dict = {'OPERATING SPEED': {'Alternate(s)': [], 'Unit(s)': 'rpm or equivalent', 'Occurrence(s)': '1'},
+                    'TOTAL MASS OF': {'Alternate(s)': ['TOTAL LOAD OF'], 'Unit(s)': 'kg', 'Occurrence(s)': '1'},
+                    'SPRING CONSTANT': {'Alternate(s)': ['BUFFER CONSTANT'], 'Unit(s)': 'kg/mm', 'Occurrence(s)': '1'},
+                    'STATIC LOAD PER SUPPORT POINT': {'Alternate(s)': [], 'Unit(s)': 'kg', 'Occurrence(s)': '2'}
+                    }
+
     while True:
         event, values = window.read()
         print(event, values)
@@ -40,7 +46,7 @@ def config_gui():
             break
         if event == 'Add Keyword':
             add_layout = [
-                [sg.Text('Add Keyword (Equivalent keywords separated by commas')],
+                [sg.Text('Add Keyword (Equivalent keywords separated by commas)')],
                 [sg.Text('Keyword', size=(15, 1)), sg.InputText(key='KEYWORD')],
                 [sg.Text('Unit(s)', size=(15, 1)),
                  sg.InputOptionMenu(('kg', 'kg/mm', 'rpm or equivalent'), size=(20, 1), key='UNIT')],
@@ -78,19 +84,18 @@ def config_gui():
 
 
 def config_writer(input_values, custom_keywords):
-    if input_values[0] is not None:
-        config = configparser.ConfigParser()
+    if input_values is not None:
+        if input_values[0] is not None:
+            config = configparser.ConfigParser()
 
-        config['DEFAULT'] = {'ocr path': r"C:\Program Files\Tesseract-OCR\tesseract.exe"}
+            config['settings'] = {'ocr path': input_values[0],
+                                  'orientation threshold': input_values[1],
+                                  'script threshold': input_values[2]}
 
-        config['settings'] = {'ocr path': input_values[0],
-                              'orientation threshold': input_values[1],
-                              'script threshold': input_values[2]}
+            config['custom keywords'] = custom_keywords
 
-        config['custom keywords'] = custom_keywords
-
-        with open('config.ini', 'w') as configfile:
-            config.write(configfile)
+            with open('config.ini', 'w') as configfile:
+                config.write(configfile)
 
 
 if __name__ == "__main__":

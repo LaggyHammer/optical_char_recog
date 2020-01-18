@@ -149,3 +149,42 @@ def regular_exp(unit):
     reg_exp = mapping[unit]
 
     return reg_exp
+
+
+keyword_dict = {'OPERATING SPEED': {'Alternate(s)': [], 'Unit(s)': 'rpm or equivalent', 'Occurrence(s)': '1'},
+                'TOTAL MASS OF': {'Alternate(s)': ['TOTAL LOAD OF'], 'Unit(s)': 'kg', 'Occurrence(s)': '1'},
+                'SPRING CONSTANT': {'Alternate(s)': ['BUFFER CONSTANT'], 'Unit(s)': 'kg/mm', 'Occurrence(s)': '1'},
+                'STATIC LOAD PER SUPPORT POINT': {'Alternate(s)': [], 'Unit(s)': 'kg', 'Occurrence(s)': '2'}
+                }
+
+
+def search_function(text, key, details):
+    regex = regular_exp(details['Unit(s)'])
+
+    # search main key
+    results = []
+    key = key.lower()
+    match_list = find_near_matches(key, text, max_l_dist=2)
+    for match in match_list:
+        search_start = match[0]
+        search_string = text[search_start:]
+        for m in itertools.islice(re.finditer(regex, search_string), details['Occurrence(s)']):
+            result = m.string[m.start():m.end()]
+            # print(result)
+            results.append(result)
+
+        if bool(results):
+            break
+
+    if not bool(results):
+        for alternate in details['Alternate(s)']:
+            results = []
+            key = key.lower()
+            match_list = find_near_matches(key, text, max_l_dist=2)
+            for match in match_list:
+                search_start = match[0]
+                search_string = text[search_start:]
+                for m in itertools.islice(re.finditer(regex, search_string), details['Occurrence(s)']):
+                    result = m.string[m.start():m.end()]
+                    # print(result)
+                    results.append(result)
