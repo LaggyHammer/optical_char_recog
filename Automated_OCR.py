@@ -91,7 +91,6 @@ def find_total_mass(text, key='TOTAL MASS OF'):
     results = []
     key = key.lower()
     match_list = find_near_matches(key, text, max_l_dist=2)
-    print(match_list)
     for match in match_list:
         search_start = match.start
         search_string = text[search_start:]
@@ -443,7 +442,7 @@ def main(input_folder='Input', write_to_file=False, searchable_pdf=False, orient
 # GUI
 
 # application version: release.improvement.bug_fix
-app_version = '0.8.15 (Beta)'
+app_version = '1.0.0 (Early Access)'
 
 
 def ocr_gui():
@@ -485,7 +484,8 @@ def ocr_gui():
         [sg.Text('_' * 80)],
         [sg.Submit()],
         [sg.Text('App Version ' + app_version, font=("Helvetica", 10)),
-         sg.Text('Created & Maintained by Ankit Saxena')]
+         sg.Text('\N{COPYRIGHT SIGN} Weir EnSci')],
+        [sg.Text('Created & Maintained by Ankit Saxena')]
 
     ]
 

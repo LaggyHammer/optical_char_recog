@@ -3,7 +3,7 @@ from ocr_main import main
 import configparser
 
 # application version: release.improvement.bug_fix
-app_version = '0.8.15 (Beta)'
+app_version = '1.0.0 (Early Access)'
 
 
 def ocr_gui():
@@ -45,7 +45,8 @@ def ocr_gui():
         [sg.Text('_' * 80)],
         [sg.Submit()],
         [sg.Text('App Version ' + app_version, font=("Helvetica", 10)),
-         sg.Text('Created & Maintained by Ankit Saxena')]
+         sg.Text('\N{COPYRIGHT SIGN} Weir EnSci')],
+        [sg.Text('Created & Maintained by Ankit Saxena')]
 
     ]
 

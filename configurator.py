@@ -21,6 +21,7 @@ def ocr_gui():
          sg.InputText(r"C:\Program Files\Tesseract-OCR\tesseract.exe"), sg.FileBrowse()],
         [sg.Text('_' * 80)],
         [sg.Submit()],
+        [sg.Text('\N{COPYRIGHT SIGN} Weir EnSci')],
         [sg.Text('Created & Maintained by Ankit Saxena')]
 
     ]
