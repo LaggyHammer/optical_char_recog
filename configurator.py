@@ -31,8 +31,6 @@ def config_gui():
 
     window = sg.Window('OCR Configurator', layout)
 
-    keyword_dict = {}
-
     keyword_dict = {'OPERATING SPEED': {'Alternate(s)': [], 'Unit(s)': 'rpm or equivalent', 'Occurrence(s)': '1'},
                     'TOTAL MASS OF': {'Alternate(s)': ['TOTAL LOAD OF'], 'Unit(s)': 'kg', 'Occurrence(s)': '1'},
                     'SPRING CONSTANT': {'Alternate(s)': ['BUFFER CONSTANT'], 'Unit(s)': 'kg/mm', 'Occurrence(s)': '1'},

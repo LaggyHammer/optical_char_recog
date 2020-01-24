@@ -8,6 +8,10 @@ import time
 import PySimpleGUI as sg
 import configparser
 from ast import literal_eval
+import logging
+
+# Logging Setup
+logging.basicConfig(filename='ocr_log.log', level=logging.DEBUG, filemode='w+')
 
 
 # Tesseract OCR File Path
@@ -79,7 +83,7 @@ def crop_table(img, filename):
     start_time = time.time()
     position_map = tesseract.image_to_pdf_or_hocr(img, extension='hocr')
     end_time = time.time()
-    print("HOCR in ""%s seconds" % (end_time - start_time))
+    logging.info("HOCR in ""%s seconds" % (end_time - start_time))
     # print(position_map)
 
     # write to file
@@ -99,7 +103,7 @@ def crop_table(img, filename):
     # print(total_coords)  # debug
 
     if total_coords is None:
-        print("Possible incorrect orientation for " + filename)
+        logging.info("Possible incorrect orientation for " + filename)
         return img
 
     total_coords = total_coords.group(0).split(' ')
@@ -133,13 +137,13 @@ def crop_table(img, filename):
 
 # Image to Text (Main OCR)
 def image_ocr(img, filename, write_to_file, searchable_pdf, search_dict):
-    print("Recognizing Text in " + filename + "...")  # debug
+    logging.info("Recognizing Text in " + filename + "...")  # debug
     start_time = time.time()
     text = tesseract.image_to_string(img,
                                      config=r'--psm 6'
                                      )
     end_time = time.time()
-    print("String in ""%s seconds" % (end_time - start_time))
+    logging.info("String in ""%s seconds" % (end_time - start_time))
     # print("Text from Image") # debug
     # print(text.lower()) # debug
 
@@ -171,9 +175,9 @@ def image_ocr(img, filename, write_to_file, searchable_pdf, search_dict):
             results_dict[keyword + ' (' + search_dict[keyword]['Unit(s)'] + ')'])
 
     # print(req_info_dict) # debug
-    print("OCR Successful")
+    logging.info("OCR Successful")
 
-    print(results_dict)
+    logging.info(results_dict)
     return results_dict
 
 
@@ -230,16 +234,15 @@ def config_reader(config_path):
 def launch_odin(input_folder, config_path,
                 write_to_file, searchable_pdf,
                 ):
-
     odin_start = time.time()
     start_time = time.time()
 
-    print("Reading Settings")
+    logging.info("Reading Settings")
     settings, key_dict = config_reader(config_path)
-    print("Script Threshold: " + (settings['script threshold']),
-          "Orientation Threshold: " + (settings['orientation threshold']))
+    logging.info("Script Threshold: " + (settings['script threshold']))
+    logging.info("Orientation Threshold: " + (settings['orientation threshold']))
     end_time = time.time()
-    print("Read settings in ""%s seconds" % (end_time - start_time))
+    logging.info("Read settings in ""%s seconds" % (end_time - start_time))
 
     ocr_engine = settings['ocr path']
     tess_path(ocr_engine)
@@ -249,16 +252,16 @@ def launch_odin(input_folder, config_path,
 
     start_time = time.time()
 
-    print("\n Reading Files...")
+    logging.info("\n Reading Files...")
     file_list = read_file_names(input_folder)
     end_time = time.time()
-    print("Read " + str(len(file_list)) + " files in ""%s seconds" % (end_time - start_time))
+    logging.info("Read " + str(len(file_list)) + " files in ""%s seconds" % (end_time - start_time))
 
-    print("\n Processing...")
+    logging.info("\n Processing...")
     req_info_dict = {}
     for file in file_list:
         start_time = time.time()
-        print("\nProcessing " + file)
+        logging.info("\nProcessing " + file)
 
         image = pdf_to_image(file)
         oriented_image = orient_image(image[0],
@@ -269,20 +272,19 @@ def launch_odin(input_folder, config_path,
                                         search_dict=key_dict)
 
         end_time = time.time()
-        print("Processed " + file + " in ""%s seconds" % (end_time - start_time))
+        logging.info("Processed " + file + " in ""%s seconds" % (end_time - start_time))
     # print(req_info_dict)  # debug
 
     start_time = time.time()
 
-    print("\n Writing to Excel...")
+    logging.info("\n Writing to Excel...")
     dict_to_excel(req_info_dict, key_dict)
     end_time = time.time()
-    print("Written to Excel in ""%s seconds" % (end_time - start_time))
+    logging.info("Written to Excel in ""%s seconds" % (end_time - start_time))
 
     odin_end = time.time()
-    print("OCR done in ""%s seconds" % (odin_end - odin_start))
+    logging.info("OCR done in ""%s seconds" % (odin_end - odin_start))
 
 
 if __name__ == "__main__":
-
     launch_odin(input_folder='Input', config_path='config.ini', write_to_file=False, searchable_pdf=False)
