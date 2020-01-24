@@ -51,7 +51,7 @@ def config_gui():
                 [sg.Text('Unit(s)', size=(15, 1)),
                  sg.InputOptionMenu(('kg', 'kg/mm', 'rpm or equivalent'), size=(20, 1), key='UNIT')],
                 [sg.Text('No. of Occurrences up to'),
-                 sg.InputOptionMenu(list(range(1, 10)), size=(20, 1), key='NUMBER')],
+                 sg.InputOptionMenu(list(range(1, 11)), size=(20, 1), key='NUMBER')],
                 [sg.Button('Add', key='ADD'), sg.Button('Done', key='DONE')],
                 [sg.Text('Keywords Added:'), sg.Text(size=(60, 1), key='ADDED-KEY-LIST')]
             ]
