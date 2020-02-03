@@ -259,20 +259,60 @@ def launch_odin(input_folder, config_path,
 
     logging.info("\n Processing...")
     req_info_dict = {}
+
+    layout = [[sg.Text("Processing ")],
+              [sg.Text("Ready ", key='processing', size=(30, 1))],
+              [sg.ProgressBar(4, orientation='h', size=(20, 2), key='progressbar')],
+              [sg.Button('Skip File', key='Skip'), sg.Cancel()]]
+    window = sg.Window('ODIN', layout)
+
     for file in file_list:
         start_time = time.time()
         logging.info("\nProcessing " + file)
 
+        progress_bar = window['progressbar']
+        event, values = window.read(timeout=10)
+        if event == 'Cancel' or event is None:
+            break
+        if event == 'Skip':
+            continue
+        window['processing'].update(file)
+        progress_bar.UpdateBar(0)
         image = pdf_to_image(file)
-        oriented_image = orient_image(image[0],
-                                      orientation_threshold=orientation_threshold, script_threshold=script_threshold)
-        table_img = crop_table(oriented_image, file)
-        req_info_dict[file] = image_ocr(table_img, file,
+        event, values = window.read(timeout=10)
+        if event == 'Cancel' or event is None:
+            break
+        if event == 'Skip':
+            continue
+        progress_bar.UpdateBar(1)
+        image = orient_image(image[0],
+                             orientation_threshold=orientation_threshold, script_threshold=script_threshold)
+        event, values = window.read(timeout=10)
+        if event == 'Cancel' or event is None:
+            break
+        if event == 'Skip':
+            continue
+        progress_bar.UpdateBar(2)
+        image = crop_table(image, file)
+        event, values = window.read(timeout=10)
+        if event == 'Cancel' or event is None:
+            break
+        if event == 'Skip':
+            continue
+        progress_bar.UpdateBar(3)
+        req_info_dict[file] = image_ocr(image, file,
                                         write_to_file=write_to_file, searchable_pdf=searchable_pdf,
                                         search_dict=key_dict)
+        event, values = window.read(timeout=10)
+        if event == 'Cancel' or event is None:
+            break
+        if event == 'Skip':
+            continue
+        progress_bar.UpdateBar(4)
 
         end_time = time.time()
         logging.info("Processed " + file + " in ""%s seconds" % (end_time - start_time))
+    window.close()
     # print(req_info_dict)  # debug
 
     start_time = time.time()
@@ -286,5 +326,3 @@ def launch_odin(input_folder, config_path,
     logging.info("OCR done in ""%s seconds" % (odin_end - odin_start))
 
 
-if __name__ == "__main__":
-    launch_odin(input_folder='Input', config_path='config.ini', write_to_file=False, searchable_pdf=False)

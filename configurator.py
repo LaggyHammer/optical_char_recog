@@ -1,5 +1,21 @@
 import configparser
 import PySimpleGUI as sg
+import sys
+import os
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
+Logo = resource_path("odin_icon_inverted.png")
 
 
 def config_gui():
@@ -12,7 +28,8 @@ def config_gui():
                         size=(20, 1))],
                [sg.Slider(range=(0, 100), orientation='h', size=(20, 15), default_value=50)]]
     layout = [
-        [sg.Text('Automated GA OCR Configurator', size=(30, 1), font=("Helvetica", 14))],
+        [sg.Image(Logo),
+         sg.Text('Automated GA OCR Configurator', size=(30, 1), font=("Helvetica", 14))],
         [sg.Text('_' * 80)],
         [sg.Text('Choose OCR Engine :', size=(35, 1))],
         [sg.Text('OCR Engine', size=(15, 1), auto_size_text=False, justification='right'),
@@ -27,9 +44,12 @@ def config_gui():
         [sg.Text('_' * 80)],
         [sg.Submit()],
         [sg.Text('Created & Maintained by Ankit Saxena')]
+
     ]
 
-    window = sg.Window('OCR Configurator', layout)
+    window = sg.Window('OCR Configurator', layout
+                       # , icon='Icon/odin_icon.ico'
+                       )
 
     keyword_dict = {'OPERATING SPEED': {'Alternate(s)': [], 'Unit(s)': 'rpm or equivalent', 'Occurrence(s)': '1'},
                     'TOTAL MASS OF': {'Alternate(s)': ['TOTAL LOAD OF'], 'Unit(s)': 'kg', 'Occurrence(s)': '1'},
@@ -39,7 +59,7 @@ def config_gui():
 
     while True:
         event, values = window.read()
-        print(event, values)
+        # print(event, values)
         if event in (None, 'Submit'):
             break
         if event == 'Add Keyword':
@@ -76,19 +96,19 @@ def config_gui():
 
     window.close()
 
-    print(keyword_dict)
+    # print(keyword_dict)
 
     return values, keyword_dict
 
 
 def config_writer(input_values, custom_keywords):
     if input_values is not None:
-        if input_values[0] is not None:
+        if input_values[1] is not None:
             config = configparser.ConfigParser()
 
-            config['settings'] = {'ocr path': input_values[0],
-                                  'orientation threshold': input_values[1],
-                                  'script threshold': input_values[2]}
+            config['settings'] = {'ocr path': input_values[1],
+                                  'orientation threshold': input_values[2],
+                                  'script threshold': input_values[3]}
 
             config['custom keywords'] = custom_keywords
 
