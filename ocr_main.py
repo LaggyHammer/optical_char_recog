@@ -232,7 +232,7 @@ def config_reader(config_path):
 
 
 def launch_odin(input_folder, config_path,
-                write_to_file, searchable_pdf,
+                write_to_file, searchable_pdf, table_recognition
                 ):
     odin_start = time.time()
     start_time = time.time()
@@ -293,7 +293,8 @@ def launch_odin(input_folder, config_path,
         if event == 'Skip':
             continue
         progress_bar.UpdateBar(2)
-        image = crop_table(image, file)
+        if table_recognition:
+            image = crop_table(image, file)
         event, values = window.read(timeout=10)
         if event == 'Cancel' or event is None:
             break

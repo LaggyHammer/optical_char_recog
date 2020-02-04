@@ -51,11 +51,14 @@ def config_gui():
                        # , icon='Icon/odin_icon.ico'
                        )
 
-    keyword_dict = {'OPERATING SPEED': {'Alternate(s)': [], 'Unit(s)': 'rpm or equivalent', 'Occurrence(s)': '1'},
-                    'TOTAL MASS OF': {'Alternate(s)': ['TOTAL LOAD OF'], 'Unit(s)': 'kg', 'Occurrence(s)': '1'},
-                    'SPRING CONSTANT': {'Alternate(s)': ['BUFFER CONSTANT'], 'Unit(s)': 'kg/mm', 'Occurrence(s)': '1'},
-                    'STATIC LOAD PER SUPPORT POINT': {'Alternate(s)': [], 'Unit(s)': 'kg', 'Occurrence(s)': '2'}
-                    }
+    # keyword_dict = {'OPERATING SPEED': {'Alternate(s)': [], 'Unit(s)': 'rpm or equivalent', 'Occurrence(s)': '1'},
+    #                 'TOTAL MASS OF': {'Alternate(s)': ['TOTAL LOAD OF'], 'Unit(s)': 'kg', 'Occurrence(s)': '1'},
+    #                 'SPRING CONSTANT': {'Alternate(s)': ['BUFFER CONSTANT'], 'Unit(s)': 'kg/mm', 'Occurrence(s)': '1'},
+    #                 'STATIC LOAD PER SUPPORT POINT': {'Alternate(s)': [], 'Unit(s)': 'kg', 'Occurrence(s)': '2'}
+    #                 }
+    keyword_dict = {'example keyword': {'Alternate(s)': ['put alternative', 'keywords', 'in a list', 'like this'],
+                                        'Unit(s)': 'kg',
+                                        'Occurrence(s)': '4'}}
 
     while True:
         event, values = window.read()
@@ -104,7 +107,17 @@ def config_gui():
 def config_writer(input_values, custom_keywords):
     if input_values is not None:
         if input_values[1] is not None:
-            config = configparser.ConfigParser()
+            config = configparser.ConfigParser(allow_no_value=True)
+
+            config.add_section('INSTRUCTIONS')
+            config.set('INSTRUCTIONS', '# This is a dummy config file\n'
+                                       '# Add Keywords by running config.exe or by entering manually\n'
+                                       '# A dummy format is given below\n'
+                                       '# Choose from Available Units only (given below):\n'
+                                       '# 1. kg 2. kg/mm 3. rpm or equivalent\n'
+                                       '# Delete the dummy format after adding keywords\n'
+
+                       )
 
             config['settings'] = {'ocr path': input_values[1],
                                   'orientation threshold': input_values[2],

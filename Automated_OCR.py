@@ -14,7 +14,7 @@ import sys
 import os
 
 # application version: release.improvement.bug_fix
-app_version = '1.5.0 (Early Access)'
+app_version = '1.6.0 (Early Access)'
 
 
 # Remove Formatting
@@ -38,8 +38,13 @@ def regular_exp(unit):
     mapping = {'kg': "\d{1,5}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o|9)",
                'kg/mm': "\d{0,3}(\.|,){0,1}(\d|o){0,3}\s{0,1}k(g|o|9)\/mm",
                'rpm or equivalent': "\d{2,5}\s{0,1}(r.{0,1}\s{0,1}p.{0,1}\s{0,1}m.{0,1}|r\s{0,1}\/\s{0,1}min){0,1}"}
+    try:
+        reg_exp = mapping[unit]
 
-    reg_exp = mapping[unit]
+    except KeyError:
+        print('Unit not available')
+        logging.info('Unit not available')
+        reg_exp = ' '
 
     return reg_exp
 
@@ -311,7 +316,7 @@ def config_reader(config_path):
 
 # ODIN Algorithm
 def launch_odin(input_folder, config_path,
-                write_to_file, searchable_pdf,
+                write_to_file, searchable_pdf, table_recognition
                 ):
     odin_start = time.time()
     start_time = time.time()
@@ -372,7 +377,8 @@ def launch_odin(input_folder, config_path,
         if event == 'Skip':
             continue
         progress_bar.UpdateBar(2)
-        image = crop_table(image, file)
+        if table_recognition:
+            image = crop_table(image, file)
         event, values = window.read(timeout=10)
         if event == 'Cancel' or event is None:
             break
@@ -443,6 +449,7 @@ def ocr_gui():
             title='Additional Files', title_color='black', relief=sg.RELIEF_SUNKEN)],
 
         [sg.Frame(layout=[
+            [sg.Checkbox('Table Recognition (for Enduron screens only)', default=False, key='-TABLE RECOG-')],
             [sg.Text('Configuration :', size=(35, 1))],
             [sg.Text('Config File', size=(15, 1), auto_size_text=False, justification='right'),
              sg.InputText('config.ini', key='-CONFIG PATH-'), sg.FileBrowse()]
@@ -485,7 +492,8 @@ if __name__ == "__main__":
         process_start_time = time.time()
 
         launch_odin(input_folder=form_values['-INPUT FOLDER-'], config_path=form_values['-CONFIG PATH-'],
-                    searchable_pdf=form_values['-PDF'], write_to_file=form_values['-TEXT FILE-'])
+                    searchable_pdf=form_values['-PDF'], write_to_file=form_values['-TEXT FILE-'],
+                    table_recognition=form_values['-TABLE RECOG-'])
 
         sg.Popup("\n Total time to run: ""%s seconds" % (time.time() - process_start_time),
                  title="OCR Results Published")
