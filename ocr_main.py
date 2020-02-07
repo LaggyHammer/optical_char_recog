@@ -232,7 +232,7 @@ def config_reader(config_path):
 
 
 def launch_odin(input_folder, config_path,
-                write_to_file, searchable_pdf, table_recognition
+                write_to_file, searchable_pdf, table_recognition, handle_orientation
                 ):
     odin_start = time.time()
     start_time = time.time()
@@ -279,14 +279,16 @@ def launch_odin(input_folder, config_path,
         window['processing'].update(file)
         progress_bar.UpdateBar(0)
         image = pdf_to_image(file)
+        image = image[0]
         event, values = window.read(timeout=10)
         if event == 'Cancel' or event is None:
             break
         if event == 'Skip':
             continue
         progress_bar.UpdateBar(1)
-        image = orient_image(image[0],
-                             orientation_threshold=orientation_threshold, script_threshold=script_threshold)
+        if handle_orientation:
+            image = orient_image(image,
+                                 orientation_threshold=orientation_threshold, script_threshold=script_threshold)
         event, values = window.read(timeout=10)
         if event == 'Cancel' or event is None:
             break

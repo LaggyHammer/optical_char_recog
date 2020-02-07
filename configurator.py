@@ -15,7 +15,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-Logo = resource_path("odin_icon_inverted.png")
+Logo = resource_path("Icon\\odin_icon_inverted.png")
 
 
 def config_gui():

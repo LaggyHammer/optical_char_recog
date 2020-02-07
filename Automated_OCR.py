@@ -14,7 +14,7 @@ import sys
 import os
 
 # application version: release.improvement.bug_fix
-app_version = '1.6.0 (Early Access)'
+app_version = '1.7.0 (Early Access)'
 
 
 # Remove Formatting
@@ -316,7 +316,7 @@ def config_reader(config_path):
 
 # ODIN Algorithm
 def launch_odin(input_folder, config_path,
-                write_to_file, searchable_pdf, table_recognition
+                write_to_file, searchable_pdf, table_recognition, handle_orientation
                 ):
     odin_start = time.time()
     start_time = time.time()
@@ -363,14 +363,16 @@ def launch_odin(input_folder, config_path,
         window['processing'].update(file.split('/')[-1])
         progress_bar.UpdateBar(0)
         image = pdf_to_image(file)
+        image = image[0]
         event, values = window.read(timeout=10)
         if event == 'Cancel' or event is None:
             break
         if event == 'Skip':
             continue
         progress_bar.UpdateBar(1)
-        image = orient_image(image[0],
-                             orientation_threshold=orientation_threshold, script_threshold=script_threshold)
+        if handle_orientation:
+            image = orient_image(image,
+                                 orientation_threshold=orientation_threshold, script_threshold=script_threshold)
         event, values = window.read(timeout=10)
         if event == 'Cancel' or event is None:
             break
@@ -450,6 +452,7 @@ def ocr_gui():
 
         [sg.Frame(layout=[
             [sg.Checkbox('Table Recognition (for Enduron screens only)', default=False, key='-TABLE RECOG-')],
+            [sg.Checkbox('Orientation Handling', default=True, key='-ORIENT IMAGE-')],
             [sg.Text('Configuration :', size=(35, 1))],
             [sg.Text('Config File', size=(15, 1), auto_size_text=False, justification='right'),
              sg.InputText('config.ini', key='-CONFIG PATH-'), sg.FileBrowse()]
@@ -493,7 +496,7 @@ if __name__ == "__main__":
 
         launch_odin(input_folder=form_values['-INPUT FOLDER-'], config_path=form_values['-CONFIG PATH-'],
                     searchable_pdf=form_values['-PDF'], write_to_file=form_values['-TEXT FILE-'],
-                    table_recognition=form_values['-TABLE RECOG-'])
+                    table_recognition=form_values['-TABLE RECOG-'], handle_orientation=form_values['-ORIENT IMAGE-'])
 
         sg.Popup("\n Total time to run: ""%s seconds" % (time.time() - process_start_time),
                  title="OCR Results Published")
