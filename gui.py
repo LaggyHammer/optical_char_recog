@@ -19,7 +19,7 @@ def resource_path(relative_path):
 Logo = resource_path("Icon\\odin_icon_inverted.png")
 
 # application version: release.improvement.bug_fix
-app_version = '1.7.0 (Early Access)'
+app_version = '1.7.1 (Early Access)'
 
 
 def ocr_gui():

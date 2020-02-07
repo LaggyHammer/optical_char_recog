@@ -43,10 +43,16 @@ def orient_image(img, orientation_threshold=0.5, script_threshold=0.5):
     (width, height) = img.size
     if height > width:
         img = img.rotate(90, expand=True)
-        info = tesseract.image_to_osd(img)  # Orientation Info
+        try:
+            info = tesseract.image_to_osd(img)  # Orientation Info
+        except Exception as e:
+            logging.error(e)
 
     else:
-        info = tesseract.image_to_osd(img)  # Orientation Info
+        try:
+            info = tesseract.image_to_osd(img)  # Orientation Info
+        except Exception as e:
+            logging.error(e)
 
     # print(info)  # debug
     info = info.split('\n')
@@ -81,7 +87,10 @@ def orient_image(img, orientation_threshold=0.5, script_threshold=0.5):
 def crop_table(img, filename):
     # img.show()  # debug
     start_time = time.time()
-    position_map = tesseract.image_to_pdf_or_hocr(img, extension='hocr')
+    try:
+        position_map = tesseract.image_to_pdf_or_hocr(img, extension='hocr')
+    except Exception as e:
+        logging.error(e)
     end_time = time.time()
     logging.info("HOCR in ""%s seconds" % (end_time - start_time))
     # print(position_map)
@@ -139,9 +148,12 @@ def crop_table(img, filename):
 def image_ocr(img, filename, write_to_file, searchable_pdf, search_dict):
     logging.info("Recognizing Text in " + filename + "...")  # debug
     start_time = time.time()
-    text = tesseract.image_to_string(img,
-                                     config=r'--psm 6'
-                                     )
+    try:
+        text = tesseract.image_to_string(img,
+                                         config=r'--psm 6'
+                                         )
+    except Exception as e:
+        logging.error(e)
     end_time = time.time()
     logging.info("String in ""%s seconds" % (end_time - start_time))
     # print("Text from Image") # debug
@@ -158,7 +170,10 @@ def image_ocr(img, filename, write_to_file, searchable_pdf, search_dict):
     if searchable_pdf:
         # print("Writing Searchable PDF...") # debug
         output_folder = 'Output'
-        pdf = tesseract.image_to_pdf_or_hocr(img, extension='pdf')
+        try:
+            pdf = tesseract.image_to_pdf_or_hocr(img, extension='pdf')
+        except Exception as e:
+            logging.error(e)
         f = open(output_folder + '/' + filename.split('.')[0].split('/')[-1] + ".pdf", "w+b")
         f.write(bytearray(pdf))
         f.close()
@@ -327,5 +342,3 @@ def launch_odin(input_folder, config_path,
 
     odin_end = time.time()
     logging.info("OCR done in ""%s seconds" % (odin_end - odin_start))
-
-
