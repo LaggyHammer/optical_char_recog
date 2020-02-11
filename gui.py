@@ -19,65 +19,111 @@ def resource_path(relative_path):
 Logo = resource_path("Icon\\odin_icon_inverted.png")
 
 # application version: release.improvement.bug_fix
-app_version = '1.7.1 (Early Access)'
+app_version = "1.7.1 (Early Access)"
 
 
 def ocr_gui():
-    sg.ChangeLookAndFeel('Reddit')
+    sg.ChangeLookAndFeel("Reddit")
 
-    menu_def = [['File', ['Exit', ]],
-                ['Help', 'About'], ]
+    menu_def = [
+        ["File", ["Exit",]],
+        ["Help", "About"],
+    ]
 
     layout = [
         [sg.Menu(menu_def)],
-        [sg.Image(Logo),
-         sg.Text('Automated OCR for GAs', size=(30, 1), font=("Helvetica", 20))],
-        [sg.Text('_' * 80)],
-        [sg.Text('Choose Input Folder :', size=(35, 1))],
-        [sg.Text('Input Folder', size=(15, 1), auto_size_text=False, justification='right'),
-         sg.InputText('Input', key='-INPUT FOLDER-'), sg.FolderBrowse()],
-
-        [sg.Frame(layout=[
-            [sg.Checkbox('Create OCR Text File', default=True, key='-TEXT FILE-'),
-             sg.Checkbox('Create Searchable PDF', default=False, key='-PDF')]
+        [
+            sg.Image(Logo),
+            sg.Text("Automated OCR for GAs", size=(30, 1), font=("Helvetica", 20)),
         ],
-            title='Additional Files', title_color='black', relief=sg.RELIEF_SUNKEN)],
-
-        [sg.Frame(layout=[
-            [sg.Checkbox('Table Recognition (for Enduron screens only)', default=False, key='-TABLE RECOG-')],
-            [sg.Checkbox('Orientation Handling', default=True, key='-ORIENT IMAGE-')],
-            [sg.Text('Configuration :', size=(35, 1))],
-            [sg.Text('Config File', size=(15, 1), auto_size_text=False, justification='right'),
-             sg.InputText('config.ini', key='-CONFIG PATH-'), sg.FileBrowse()]
+        [sg.Text("_" * 80)],
+        [sg.Text("Choose Input Folder :", size=(35, 1))],
+        [
+            sg.Text(
+                "Input Folder",
+                size=(15, 1),
+                auto_size_text=False,
+                justification="right",
+            ),
+            sg.InputText("Input", key="-INPUT FOLDER-"),
+            sg.FolderBrowse(),
         ],
-            title='Advanced Settings', title_color='black', relief=sg.RELIEF_SUNKEN)],
-
-        [sg.Text('_' * 80)],
-        [sg.Submit()]
-
+        [
+            sg.Frame(
+                layout=[
+                    [
+                        sg.Checkbox(
+                            "Create OCR Text File", default=True, key="-TEXT FILE-"
+                        ),
+                        sg.Checkbox("Create Searchable PDF", default=False, key="-PDF"),
+                    ]
+                ],
+                title="Additional Files",
+                title_color="black",
+                relief=sg.RELIEF_SUNKEN,
+            )
+        ],
+        [
+            sg.Frame(
+                layout=[
+                    [
+                        sg.Checkbox(
+                            "Table Recognition (for Enduron screens only)",
+                            default=False,
+                            key="-TABLE RECOG-",
+                        )
+                    ],
+                    [
+                        sg.Checkbox(
+                            "Orientation Handling", default=True, key="-ORIENT IMAGE-"
+                        )
+                    ],
+                    [sg.Text("Configuration :", size=(35, 1))],
+                    [
+                        sg.Text(
+                            "Config File",
+                            size=(15, 1),
+                            auto_size_text=False,
+                            justification="right",
+                        ),
+                        sg.InputText("config.ini", key="-CONFIG PATH-"),
+                        sg.FileBrowse(),
+                    ],
+                ],
+                title="Advanced Settings",
+                title_color="black",
+                relief=sg.RELIEF_SUNKEN,
+            )
+        ],
+        [sg.Text("_" * 80)],
+        [sg.Submit()],
     ]
 
-    form = sg.Window('ODIN ' + app_version, default_element_size=(40, 1), layout=layout,
-                     # icon='Icon/odin_icon.ico'
-                     )
+    form = sg.Window(
+        "ODIN " + app_version,
+        default_element_size=(40, 1),
+        layout=layout,
+        # icon='Icon/odin_icon.ico'
+    )
 
     while True:
         event, values = form.read()
         # print(event)  # debug
 
-        if event in (None, 'Exit'):
+        if event in (None, "Exit"):
             break
 
-        if event == 'About':
+        if event == "About":
             sg.Popup(
-                'ODIN ' + app_version,
-                '\N{COPYRIGHT SIGN} Weir EnSci',
-                'ODIN extracts data from Engineering Drawings',
-                'Visit cloudweir.sharepoint.com/sites/AutomatedOCRReleases for more info',
-                'Created & Maintained by Ankit Saxena (Ankit.Saxena@mail.weir)',
-                title='About ODIN')
+                "ODIN " + app_version,
+                "\N{COPYRIGHT SIGN} Weir EnSci",
+                "ODIN extracts data from Engineering Drawings",
+                "Visit cloudweir.sharepoint.com/sites/AutomatedOCRReleases for more info",
+                "Created & Maintained by Ankit Saxena (Ankit.Saxena@mail.weir)",
+                title="About ODIN",
+            )
 
-        if event == 'Submit':
+        if event == "Submit":
             return values
 
 
@@ -87,9 +133,16 @@ if __name__ == "__main__":
     if form_values is not None:
         process_start_time = time.time()
 
-        launch_odin(input_folder=form_values['-INPUT FOLDER-'], config_path=form_values['-CONFIG PATH-'],
-                    searchable_pdf=form_values['-PDF'], write_to_file=form_values['-TEXT FILE-'],
-                    table_recognition=form_values['-TABLE RECOG-'], handle_orientation=form_values['-ORIENT IMAGE-'])
+        launch_odin(
+            input_folder=form_values["-INPUT FOLDER-"],
+            config_path=form_values["-CONFIG PATH-"],
+            searchable_pdf=form_values["-PDF"],
+            write_to_file=form_values["-TEXT FILE-"],
+            table_recognition=form_values["-TABLE RECOG-"],
+            handle_orientation=form_values["-ORIENT IMAGE-"],
+        )
 
-        sg.Popup("\n Total time to run: ""%s seconds" % (time.time() - process_start_time),
-                 title="OCR Results Published")
+        sg.Popup(
+            "\n Total time to run: " "%s seconds" % (time.time() - process_start_time),
+            title="OCR Results Published",
+        )

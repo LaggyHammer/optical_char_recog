@@ -1,25 +1,28 @@
 import pytesseract as tesseract
 from PIL import Image
 import nltk
-nltk.download('punkt')
-nltk.download('stopwords')
+
+nltk.download("punkt")
+nltk.download("stopwords")
 
 tesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 # File
-filename = 'do-a-complete-drawing-of-the-general-arrangement-of-your-pressure-vessel.jpg'
+filename = (
+    "do-a-complete-drawing-of-the-general-arrangement-of-your-pressure-vessel.jpg"
+)
 
 # Image to Text
 img = Image.open(filename)
 text_proc = tesseract.image_to_string(img)
 print("Text from Processed Image")
 print(text_proc)
-#print(type(text))
+# print(type(text))
 
 print("Text from Raw Image")
 text_unproc = tesseract.image_to_string(filename)
 print(text_unproc)
-#print(type(text))
+# print(type(text))
 
 # Program to measure similarity between
 # two sentences using cosine similarity.
@@ -36,8 +39,8 @@ X_list = word_tokenize(X)
 Y_list = word_tokenize(Y)
 
 # sw contains the list of stopwords
-sw = stopwords.words('english')
-l1 = [];
+sw = stopwords.words("english")
+l1 = []
 l2 = []
 
 # remove stop words from string
